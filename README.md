@@ -127,8 +127,8 @@ A atual versão, aprimorada e revisada, conta com a participação de dois novos
 *Deixa-se aqui agradecimento à Dra. Carol, querida amiga, pelo convite inicial que deu origem a essa série de atualizações e por gentilmente compartilhar o material do curso.*
 
 Genealogia do curso:
-- Outubro/2026. EPB 2026. *Análise de Dados de Transcriptômica e Espacial*
-- Setembro/2026. RSG-Brazil. *Análise de Dados de Transcriptômica e Espacial*
+- Outubro/2026. EPB 2026. *Análise de Dados de Transcriptômica Espacial*
+- Setembro/2026. RSG-Brazil. *Análise de Dados de Transcriptômica Espacial*
 - Junho/2026. X-meeting 2026. *Análise de Dados de Transcriptômica Single-Cell e Espacial*
 
 ## Declaração de IA
