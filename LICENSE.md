@@ -1,6 +1,6 @@
 # Licenças
 
-Copyright (c) 2026 Flávio Gabriel Carazza-Kessler e Carolina Saibro-Girardi
+Copyright (c) 2026 Flávio Gabriel Carazza-Kessler, Carolina Saibro-Girardi, Lana Peters Bazan Querne e Jonathan André Back
 
 Contato: [flaviokessler@ufpr.br](mailto:flaviokessler@ufpr.br)
 
@@ -20,7 +20,7 @@ https://creativecommons.org/licenses/by-nc/4.0/legalcode.pt
 
 MIT License
 
-Copyright (c) 2026 Flávio Gabriel Carazza-Kessler e Carolina Saibro-Girardi
+Copyright (c) 2026 Flávio Gabriel Carazza-Kessler, Carolina Saibro-Girardi, Lana Peters Bazan Querne e Jonathan André Back
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

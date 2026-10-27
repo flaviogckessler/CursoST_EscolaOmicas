@@ -1,6 +1,6 @@
 # Análise de Dados de Transcriptômica Espacial
 
-*Setembro 2026*
+*Outubro 2026*
 
 Este repositório reúne os materiais do curso **Análise de Dados de Transcriptômica Espacial**, dedicado aos fundamentos das tecnologias de transcriptômica de alta resolução e às estratégias de análise de dados espaciais. O curso combina aulas expositivas e atividades práticas em R, com ênfase em dados gerados pela plataforma Visium.
 
@@ -28,6 +28,7 @@ Ao final do curso, espera-se que as pessoas participantes sejam capazes de:
 -   normalização;
 -   redução de dimensionalidade;
 -   uso do pacote Seurat em R;
+-   identificação de genes espacialmente variáveis (SVGs);
 -   visualização contínua de sinal com PathwaySpace.
 
 ### 3. Análise de dados em transcriptômica espacial
@@ -49,17 +50,19 @@ O curso tem caráter teórico-prático. As exposições conceituais são seguida
 
 ## Carga horária e programação
 
-A carga horária total é de **8 horas**, distribuídas da seguinte forma:
+A carga horária total é de **9 horas**, distribuídas da seguinte forma:
 
-| Data                  | Horário     |
-|-----------------------|-------------|
-| 07/09 (segunda-feira) | 18h30–20h30 |
-| 08/09 (terça-feira)   | 18h30–21h30 |
-| 09/09 (quarta-feira)  | 18h30–21h30 |
+| Data                 | Horário |
+|----------------------|---------|
+| 27/10 (terça-feira)  | 9h–12h  |
+| 28/10 (quarta-feira) | 9h–12h  |
+| 29/10 (quinta-feira) | 9h–12h  |
 
 ## Pré-requisitos
 
-São recomendados conhecimentos básicos de biologia molecular e de tecnologias de sequenciamento. Experiência prévia com alguma linguagem de programação é desejável, mas não obrigatória.
+São recomendados conhecimentos básicos de biologia molecular e de tecnologias de sequenciamento. Experiência prévia com linguagem de programação R é desejável, mas não obrigatória.
+
+**Recursos:** computador com R 4.5 ou superior, RStudio, acesso à internet e pacotes previamente instalados. A execução de algumas atividades podem exigir cerca de 20 GB de memória, mas alternativas são fornecidas para o acompanhamento da aula.
 
 ## Vinhetas
 
@@ -93,7 +96,7 @@ Os artigos científicos, capítulos, tutoriais, vídeos e repositórios citados 
 -   [Explorar as leituras recomendadas no GitHub Pages](https://flaviogckessler.github.io/Curso_ST/apresentacoes/LEITURA_RECOMENDADA.html)
 -   [Consultar a lista em Markdown](apresentacoes/LEITURA_RECOMENDADA.md)
 
-## Ministrante
+## Ministrantes
 
 **Flávio Gabriel Carazza-Kessler**
 
@@ -102,13 +105,31 @@ Os artigos científicos, capítulos, tutoriais, vídeos e repositórios citados 
 -   [LinkedIn](https://www.linkedin.com/in/flaviogckessler)
 -   Contato: [flaviokessler\@ufpr.br](mailto:flaviokessler@ufpr.br)
 
+**Lana Bazan Peters Querne**
+
+-   [Currículo Lattes](http://lattes.cnpq.br/8667049282972617)
+-   Contato: [lanapeters\@ufpr.br](mailto:lanapeters@ufpr.br)
+
+**Jonathan André Back**
+
+-   [Currículo Lattes](http://lattes.cnpq.br/1008893623298003)
+-   [LinkedIn](https://www.linkedin.com/in/jonathan-a-back)
+-   Contato: [jonathanback01\@gmail.com](mailto:jonathanback01@gmail.com)
+
 ## Histórico
 
-Esse curso tem origem em um curso entitulado "Análise de Dados de Transcriptômica Single-Cell e Espacial" ministrado pela Dra. Carolina Saibro-Girardi e por mim, Flávio, durante o congresso X-meeting 2026. Lá, fui gentilmente convidado para ministrar o curso novamente. Dessa vez, porém, focado mais em transcriptômica espacial e (infelizmente) ministrado apenas por mim.
+O curso aqui apresentado está em constante adaptação e atualização. Ele tem sua origem no congresso X-meeting 2026, no qual a primeira versão foi ministrada pela Dra. [Carolina Saibro-Girardi](http://lattes.cnpq.br/0251933645400206) e por Flávio. O curso de então foi entitulado como "Análise de Dados de Transcriptômica Single-Cell e Espacial" e focava em análise tanto de dados de single-cell quanto de transcriptômica espacial.
 
-De toda maneira, a estrutura do curso, apresentações e códigos são oriundos (parcial ou majoritarimente) da primeira versão do curso. Por essa razão, alguns documentos contam com o nome da Dra. Carol.
+Ainda no X-meeting 2026, a RSG-Brazil convida para que o curso fosse ministrado novamente, dessa vez focando apenas em dados de transcriptômica espacial. Esta versão do curso está disponível em: (https://github.com/flaviogckessler/Curso_ST).
 
-*Deixo aqui meu agradecimento à Carol, querida amiga, por primeiro ter me convidado para participar da primeira versão como também por compartilhar o material do curso.*
+A atual versão, aprimorada e revisada, conta com a participação de dois novos ministrantes: Lana Querne e Jonathan Back, que dedicam seus doutorado e mestrado, respectivamente, para a análise de dados de transcriptômica espacial.
+
+*Deixa-se aqui agradecimento à Dra. Carol, querida amiga, pelo convite inicial que deu origem a essa série de atualizações e por gentilmente compartilhar o material do curso.*
+
+Genealogia do curso:
+- Outubro/2026. EPB 2026. *Análise de Dados de Transcriptômica e Espacial*
+- Setembro/2026. RSG-Brazil. *Análise de Dados de Transcriptômica e Espacial*
+- Junho/2026. X-meeting 2026. *Análise de Dados de Transcriptômica Single-Cell e Espacial*
 
 ## Declaração de IA
 
