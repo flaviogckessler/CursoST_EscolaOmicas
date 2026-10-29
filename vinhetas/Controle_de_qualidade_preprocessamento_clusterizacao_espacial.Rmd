@@ -18,15 +18,12 @@ params:
 ---
 
 ```{r configuracao, include=FALSE, purl=FALSE}
-executar_analise <- if (exists("params", inherits = FALSE)) {
-  isTRUE(params$run_analysis)
-} else {
-  TRUE
-}
+#executar_analise <- if (exists("params", inherits = FALSE)) {isTRUE(params$run_analysis)} else {TRUE}
+#executar_analise <- TRUE
 
 knitr::opts_chunk$set(
   echo = TRUE,
-  eval = executar_analise,
+  eval = TRUE,
   collapse = TRUE,
   comment = "#>",
   fig.align = "center",
@@ -59,7 +56,7 @@ A versão HTML desta vinheta apresenta o roteiro sem executar a análise. Durant
 
 Antes de executar o código, defina o diretório de trabalho como a pasta `vinhetas/`. No RStudio, use **Session \> Set Working Directory \> To Source File Location**. Em seguida, execute:
 
-```{r definir-diretorios}
+```{r definir-diretorios,eval=TRUE}
 diretorio_vinhetas <- getwd()
 diretorio_curso <- dirname(diretorio_vinhetas)
 diretorio_dados <- file.path(diretorio_curso, "data")
@@ -460,7 +457,7 @@ de_markers <- FindMarkers(
   assay = "SCT"
 )
 
-de_markers
+head(de_markers)
 ```
 
 O data frame `de_markers` obtido elenca os genes diferencialmente expressos entre os fatores fornecidos, nesse caso dois clusteres. As colunas indicam:
