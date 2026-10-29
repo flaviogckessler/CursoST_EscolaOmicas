@@ -1,0 +1,306 @@
+---
+title: "Segmentação Celular - VisiumHD"
+author:
+  - name: Sysbiolab Team
+  - name: Lana Bazan Peters Querne
+date: "2026-10-29"
+bibliography: ../bibliography.bib
+link-citations: true
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    number_sections: true
+    code_folding: show
+params:
+  run_analysis: false
+---
+
+# Visão geral
+
+Nesta vinheta, exploraremos limites celulares de um conjunto VisiumHD por meio da integração entre `RGraphSpace`, `PathwaySpace`, `sf` e `ggplot2` [@RGraphSpace2026]. Cada célula será representada como o polígono correspondente à sua segmentação, . A expressão de `PIGR` será projetada nas duas representações como exemplo de uso.
+
+O roteiro foi adaptado da vinheta do Sysbiolab Team, [Spatial-segmented data with SpatialExperiment and RGraphSpace](https://sysbiolab.github.io/RGraphSpace/articles/spatial-segmentation2.html).
+
+> **Importante:** esta análise não executa um novo algoritmo de segmentação sobre a imagem. Os limites celulares já foram estimados pelo processamento do VisiumHD; aqui, eles são carregados, inspecionados e utilizados como geometrias espaciais no `GraphSpace`.
+
+Ao final, você será capaz de:
+
+1.  baixar e carregar o objeto `GraphSpace` preparado para o curso
+2.  acessar as geometrias celulares armazenadas no objeto
+3.  plotar a expressão nos polígonos celulares
+4.  projetar o sinal da expressão nos polígonos utilizando o pacccote `PathwaySpace`
+
+# Origem e preparação dos dados
+
+Os dados brutos do VisiumHD não serão baixados diretamente nesta atividade porque o arquivo compactado possui mais de **3 GB** e a importação completa exige tempo, memória e processamento consideráveis. Para tornar a atividade rápida e reproduzível, usaremos apenas a região previamente recortada e salva como um objeto mais leve.
+
+A preparação completa será disponibilizada posteriormente em uma vinheta avançada no repositório do curso. Nela, os dados brutos serão baixados, carregados pelo SpatialExperiments, convertidos para `GraphSpace`, associados aos polígonos celulares, orientados e recortados.
+
+O objeto resultante está disponibilizado no Google Drive: [fonte de VisiumHD_GS_Crop.RDS no GitHub](https://drive.google.com/drive/folders/1ApwymIUt477-iTv340lzC8aIU6QYLdT7?usp=sharing). O bloco de download desta vinheta utiliza o endereço direto desse arquivo.
+
+# Preparar o ambiente
+
+## Definir as pastas
+
+Antes de executar o código, defina o diretório de trabalho como a pasta `vinhetas/`. No RStudio, use **Session \> Set Working Directory \> To Source File Location**. O objeto baixado será mantido em `data/`.
+
+``` text
+Curso_ST/
+|-- imagens/
+`-- data/
+     `-- VisiumHD_GS_Crop.RDS
+```
+
+```{r definir-diretorios}
+diretorio_vinhetas <- getwd()
+diretorio_curso <- dirname(diretorio_vinhetas)
+diretorio_imagens <- file.path("~/curso_transcriptomica", "imagens")
+diretorio_dados <- file.path("~/curso_transcriptomica", "data")
+
+# Caso não tenha criado na vinheta anterior, rodar o seguinte código:
+# dir.create(diretorio_dados, showWarnings = FALSE, recursive = TRUE)
+```
+
+## Conferir os pacotes necessários
+
+A instalação dos pacotes do curso está centralizada em [Configuracao_do_ambiente_RStudio.Rmd](https://flaviogckessler.github.io/Curso_ST/vinhetas/Configuracao_do_ambiente_RStudio.html). Depois de executar a vinheta e reiniciar a sessão do R, use o bloco abaixo para confirmar que o ambiente está pronto.
+
+```{r conferir-pacotes}
+pacotes_segmentacao <- c(
+  "RGraphSpace", "sf", "ggplot2", "patchwork", "PathwaySpace")
+
+pacotes_ausentes <- pacotes_segmentacao[
+  !vapply(pacotes_segmentacao, requireNamespace, logical(1), quietly = TRUE)]
+
+if (length(pacotes_ausentes) > 0) {
+  stop("Execute primeiro Configuracao_do_ambiente_RStudio.Rmd. ",
+    "Pacotes ausentes: ",paste(pacotes_ausentes, collapse = ", "))}
+```
+
+## Carregar os pacotes
+
+```{r carregar-pacotes, message=FALSE}
+library("RGraphSpace")
+library("sf")
+library("ggplot2")
+library("patchwork")
+library("PathwaySpace")
+```
+
+# Baixar e carregar o objeto preparado
+
+O download é realizado somente quando o arquivo ainda não existe em `data/`.
+
+```{r baixar-objeto-preparado}
+# Baixe o arquivo diretamente do Google Drive e salve no no caminho do diretorio_dados
+arquivo_dados <- file.path(diretorio_dados, "VisiumHD_GS_Crop.RDS")
+
+gs_crop <- readRDS(arquivo_dados)
+
+if (!inherits(gs_crop, "GraphSpace")) {
+  stop("O arquivo baixado não contém um objeto da classe GraphSpace.")}
+
+gs_crop
+```
+
+# Inspecionar as geometrias celulares
+
+Os polígonos estão armazenados como uma coleção de geometrias simples do pacote `sf`. Cada posição da coleção corresponde a uma célula e está alinhada ao respectivo vértice do `GraphSpace`.
+
+```{r acessar-geometrias}
+gs_crop@nodes$cellseg
+
+geometrias_celulares <- gs_crop@nodes$cellseg
+
+length(geometrias_celulares)
+sf::st_geometry_type(geometrias_celulares) |> table()
+```
+
+## Visualizar células individuais
+
+Para exemplificar, as três primeiras geometrias são mostradas separadamente. O contorno preserva a forma e a área estimadas para cada célula, enquanto sua posição permanece no sistema de coordenadas normalizado durante a preparação dos dados.
+
+```{r visualizar-celulas-individuais, fig.show='hold', out.width='32%', fig.width=4, fig.height=4}
+plot(gs_crop@nodes$cellseg[1])
+plot(gs_crop@nodes$cellseg[2])
+plot(gs_crop@nodes$cellseg[3])
+```
+
+## Combinar as primeiras vinte geometrias
+
+`st_combine()` reúne as geometrias em uma única coleção sem dissolver os limites entre células. Assim, os vinte contornos continuam reconhecíveis no mesmo painel.
+
+```{r combinar-geometrias, fig.width=6, fig.height=6}
+plot(st_combine(gs_crop@nodes$cellseg[1:20]))
+```
+
+## Visualização dos limites celulares sobre a imagem do tecido
+
+Para que todos os painéis sejam comparáveis, todos utilizam a transformação `log2(x + 1)`, a mesma paleta e os mesmos limites de escala para a expressão de `PIGR`.
+
+```{r definir-escala}
+cpal <- hcl.colors(100, palette = "Geyser", rev = FALSE)
+data_range <- range(log2(gs_crop[["fdata"]] + 1))
+```
+
+Nesta resolução, os limites reais de segmentação celular podem ser traçados diretamente sobre a imagem do tecido, juntamente com os centroides dos nós. Neste gráfico, é possível observar o alinhamento correto entre a geometria e a imagem.
+
+```{r representar-limites, fig.width=7, fig.height=6}
+p_nodes <- ggplot(gs_crop) + 
+  annotation_gspace_image(gs_crop, opacity = 1) +
+  geom_sf( aes(geometry = cellseg), fill = NA, 
+    linewidth = 0.3, colour = "cyan") +
+  geom_nodespace(colour = "black", size = 0.1, pch = 19) +
+  scale_fill_continuous(palette = cpal, limits = data_range) +
+  theme_gspace_coords(
+    theme = "th3",is_norm = TRUE,
+    xlab = "Coordenada do tecido 1",
+    ylab = "Coordenada do tecido 2")
+p_nodes
+```
+
+# Comparar centros e polígonos celulares
+
+## Representar as células como vértices
+
+No primeiro painel, cada célula é representada por um ponto localizado em seu centro. Essa forma compacta facilita a inspeção da distribuição espacial geral, mas não mostra o contorno celular.
+
+```{r representar-vertices, fig.width=7, fig.height=6}
+p1 <- ggplot(gs_crop) +
+  annotation_gspace_image(gs_crop, opacity = 1) +
+  geom_nodespace(
+    mapping = aes(colour = log2(PIGR + 1)),
+    size = 1.5,pch = 19) +
+  scale_colour_continuous(palette = cpal, limits = data_range) +
+  theme_gspace_coords(
+    theme = "th3",is_norm = TRUE,
+    xlab = "Coordenada do tecido 1",
+    ylab = "Coordenada do tecido 2")
+
+p1
+```
+
+## Representar as células como polígonos
+
+No segundo painel, a expressão preenche o polígono de cada célula. Os centros são sobrepostos como pequenos pontos pretos para evidenciar a correspondência entre as duas representações.
+
+```{r representar-poligonos, fig.width=7, fig.height=6}
+p2 <- ggplot(gs_crop) +
+  annotation_gspace_image(gs_crop, opacity = 1) +
+  geom_sf(
+    mapping = aes(
+      geometry = cellseg,
+      fill = log2(PIGR + 1))) +
+  scale_fill_continuous(palette = cpal, limits = data_range) +
+  geom_nodespace(colour = "black", size = 0.2, pch = 19) +
+  theme_gspace_coords(
+    theme = "th3",is_norm = TRUE,
+    xlab = "Coordenada do tecido 1",
+    ylab = "Coordenada do tecido 2")
+
+p2
+```
+
+## Colocar as representações lado a lado
+
+O painel final resume a integração do RGraphSpace com as geometrias `sf`. A posição e a expressão são as mesmas nos dois lados; muda apenas a representação espacial de cada célula.
+
+```{r comparar-representacoes, fig.width=12, fig.height=6}
+p <- p1 + p2 + 
+  patchwork::plot_annotation(
+    title = "Integração do RGraphSpace com geometrias sf",
+    theme = theme(plot.title = element_text(hjust = 0.5)))
+p
+
+ggsave(filename = file.path(diretorio_imagens, "SegCelular_GS_VisiumHD_PIGR.png"),
+    plot = p,width = 9,height = 6,units = "in",dpi = 120,bg = "white")
+```
+
+# Projeção do sinal com PathwaySpace
+
+## Rodando `PathwaySpace`
+
+O objeto `PathwaySpace` é criado a partir do objeto `GraphSpace` utilizando a função `buildPathwaySpace()`. Antes de executar a projeção, precisamos especificar uma unidade de distância para a função de decaimento do sinal. Essa unidade afetará a extensão na qual o sinal é projetado no espaço de coordenadas. Utilizaremos a distância de centro a centro entre as geometrias.
+
+```{r criar-pathwayspace}
+pspace_obj <- buildPathwaySpace(gs_crop, nrc = 700)
+
+nspot <- getNearestNode(pspace_obj)
+pdist <- mean(nspot$dist) # distância média
+pdist
+```
+
+Em seguida, é criado a silhueta do grafo para o objeto PathwaySpace. Podemos visualizar a silhueta em união com o `ggplot2`
+
+```{r representar-silhueta, fig.width=7, fig.height=6}
+pspace_obj <- silhouetteMapping(pspace_obj, fill.cavity = FALSE, baseline = 0.03, pdist = max(nspot$dist))
+
+ggplot(pspace_obj) + 
+  annotation_gspace_image(pspace_obj) + 
+  annotation_pspace_signal(pspace_obj, si.alpha = 0.5) +
+  theme_gspace_coords(
+    theme = "th3",is_norm = TRUE,
+    xlab = "Coordenada do tecido 1",
+    ylab = "Coordenada do tecido 2")
+```
+
+## Definindo a feature e projetando o sinal
+
+Selecionaremos como feature o gene `PIGR`, para comparação com os plots feitos utilizando o RGraphSpace anteriormente.
+
+```{r definir-feature}
+activeFeature(pspace_obj) <- "PIGR"
+
+pspace_obj <- circularProjection(pspace_obj, k = gs_vcount(pspace_obj), 
+                                 decay.fun = weibullDecay(decay=0.5, pdist = pdist))
+```
+
+Por fim, podemos visualizar o resultado da projeção do sinal do gene `PIGR` e comparar lado a lado com a figura equivalente utilizando o RGraphSpace.
+
+```{r comparar-plots, fig.width=12, fig.height=6}
+p3 <- ggplot(pspace_obj) + 
+  annotation_gspace_image(pspace_obj) +
+  annotation_pspace_signal(pspace_obj, si.alpha = 0, title = "") +
+  geom_sf(
+    aes(
+      geometry = cellseg
+    ),
+    alpha = 0,
+    linewidth = 0.3,
+    colour = "white"
+  ) +
+  geom_nodespace(
+    colour = "black",
+    size = 0.1,
+    pch = 19
+  ) +
+  theme_gspace_coords(
+    theme = "th3",is_norm = TRUE,
+    xlab = "Coordenada do tecido 1",
+    ylab = "Coordenada do tecido 2")
+
+p_comp <- p2 + p3 +
+  patchwork::plot_annotation(
+    title = "Integração do RGraphSpace com PathwaySpace",
+    theme = theme(plot.title = element_text(hjust = 0.5)))
+p_comp
+
+ggsave(filename = file.path(diretorio_imagens, "SegCelular_GS_PS_VisiumHD_PIGR.png"),
+    plot = p_comp,width = 9,height = 6,units = "in",dpi = 120,bg = "white")
+```
+
+# Conclusão
+
+A representação por vértices resume cada célula em uma posição, enquanto a representação por polígonos incorpora seus limites espaciais. Como o `GraphSpace` mantém expressão, posições e geometrias alinhadas, os mesmos atributos podem ser mapeados diretamente com a gramática do `ggplot2` [@RGraphSpace2026].
+
+O objeto `VisiumHD_GS_Crop.RDS` permanece disponível para novas explorações sem a necessidade de baixar e processar novamente os dados brutos do VisiumHD.
+
+# Informações da sessão
+
+```{r informacoes-sessao, echo=FALSE}
+sessionInfo()
+```
+
+# Referências
