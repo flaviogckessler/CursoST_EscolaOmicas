@@ -1,6 +1,6 @@
 # Análise de Dados de Transcriptômica Espacial
 
-*Outubro 2026*
+*Novembro 2026*
 
 Este repositório reúne os materiais do curso **Análise de Dados de Transcriptômica Espacial**, dedicado aos fundamentos das tecnologias de transcriptômica de alta resolução e às estratégias de análise de dados espaciais. O curso combina aulas expositivas e atividades práticas em R, com ênfase em dados gerados pela plataforma Visium.
 
@@ -52,11 +52,11 @@ O curso tem caráter teórico-prático. As exposições conceituais são seguida
 
 A carga horária total é de **9 horas**, distribuídas da seguinte forma:
 
-| Data                 | Horário |
-|----------------------|---------|
-| 27/10 (terça-feira)  | 9h–12h  |
-| 28/10 (quarta-feira) | 9h–12h  |
-| 29/10 (quinta-feira) | 9h–12h  |
+| Data                 | Horário  |
+|----------------------|----------|
+| 06/11 (sexta-feira)  | 18h–21h  |
+| 12/11 (quinta-feira) | 18h–21h  |
+| 13/11 (sexta-feira)  | 18h–21h  |
 
 ## Pré-requisitos
 
@@ -64,16 +64,37 @@ São recomendados conhecimentos básicos de biologia molecular e de tecnologias 
 
 **Recursos:** computador com R 4.5 ou superior, RStudio, acesso à internet e pacotes previamente instalados. A execução de algumas atividades podem exigir cerca de 20 GB de memória, mas alternativas são fornecidas para o acompanhamento da aula.
 
+## Aulas
+
+### Apresentações
+
+As apresentações apresentam o mesmo formato utilizado em aula, estruturada em slides.
+
+1. [Aula 01](https://flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/aula01/aula01-slides.html)
+2. [Aula 02](https://flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/aula02/aula02-slides.html)
+3. [Aula 03](https://flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/aula03/aula03-slides.html)
+
+### Roteiros
+
+Roteiros das aulas seguem o mesmo fluxo utilizado nas apresentações, porém compilam o tema e códigos abordados de maneira corrida para facilitar a reprodução do código pelo aluno. Não há roteiro da Aula 01 por ela ser mais de caráter teórico e introdutório, a parte final de configuração do ambiente R pode ser seguida pela primeira vinheta apresentada.
+
+2. [Aula 02](https://flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/aula02/aula02-roteiro.html)
+3. [Aula 03](https://flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/aula03/aula03-roteiro.html)
+
 ## Vinhetas
 
 ### do Curso
 
-1.  [Configuração do ambiente RStudio](https://flaviogckessler.github.io/Curso_ST/vinhetas/Configuracao_do_ambiente_RStudio.html) — Aula 1
-2.  [Controle de qualidade, pré-processamento e clusterização de dados espaciais](https://flaviogckessler.github.io/Curso_ST/vinhetas/Controle_de_qualidade_preprocessamento_clusterizacao_espacial.html) — Aula 2
-3.  [Visualização contínua de dados espaciais com PathwaySpace](https://flaviogckessler.github.io/Curso_ST/vinhetas/Visualizacao_Continua_PathwaySpace.html) — Aula 2
-4.  [Deconvolução com RCTD](https://flaviogckessler.github.io/Curso_ST/vinhetas/RCTD_Deconvolution_stxbrain.html) — Aula 3
-5.  [Comunicação celular](https://flaviogckessler.github.io/Curso_ST/vinhetas/CellChat_Comunicacao_Celular_PathwaySpace.html) — Aula 3
-6.  [Segmentação Celular](https://flaviogckessler.github.io/Curso_ST/vinhetas/Segmentacao_Celular.html) — Aula 3
+As vinhetas do curso apresentam os temas apresentados nas aulas de maneira individual.
+
+1.  [Configuração do ambiente RStudio](https://flaviogckessler.github.io/CursoST_EscolaOmicas/vinhetas/Configuracao_do_ambiente_RStudio.html) — Aula 1
+2.  [Controle de qualidade, pré-processamento e clusterização de dados espaciais](https://flaviogckessler.github.io/CursoST_EscolaOmicas/vinhetas/Controle_de_qualidade_preprocessamento_clusterizacao_espacial.html) — Aula 2
+3.  [Visualização contínua de dados espaciais com PathwaySpace](https://flaviogckessler.github.io/CursoST_EscolaOmicas/vinhetas/Visualizacao_Continua_PathwaySpace.html) — Aula 2
+4.  [Deconvolução com RCTD](https://flaviogckessler.github.io/CursoST_EscolaOmicas/vinhetas/RCTD_Deconvolution_stxbrain.html) — Aula 3
+5.  [Comunicação celular](https://flaviogckessler.github.io/CursoST_EscolaOmicas/vinhetas/CellChat_Comunicacao_Celular_PathwaySpace.html) — Aula 3
+6.  [Segmentação Celular - Plataforma Visium HD](https://flaviogckessler.github.io/CursoST_EscolaOmicas/vinhetas/Segmentacao_Celular_VisiumHD.html) — Aula 3
+7.  [Segmentação Celular - Plataforma Xenium](https://flaviogckessler.github.io/CursoST_EscolaOmicas/vinhetas/Segmentacao_Celular.html) — Spin-off aula 3
+
 
 ### Vinhetas externas recomendadas
 
@@ -127,6 +148,7 @@ A atual versão, aprimorada e revisada, conta com a participação de dois novos
 *Deixa-se aqui agradecimento à Dra. Carol, querida amiga, pelo convite inicial que deu origem a essa série de atualizações e por gentilmente compartilhar o material do curso.*
 
 Genealogia do curso:
+- Novembro/2026. RSG-Brazil - Escola de Ômicas. *Transcriptômica Espacial em Ambiente R*
 - Outubro/2026. EPB 2026. *Análise de Dados de Transcriptômica Espacial*
 - Setembro/2026. RSG-Brazil. *Análise de Dados de Transcriptômica Espacial*
 - Junho/2026. X-meeting 2026. *Análise de Dados de Transcriptômica Single-Cell e Espacial*
