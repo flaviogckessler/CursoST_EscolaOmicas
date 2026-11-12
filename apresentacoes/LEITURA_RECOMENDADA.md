@@ -1,131 +1,110 @@
 ---
-title: "Leitura recomendada"
+title: "Leituras recomendadas"
 bibliography: ../bibliography.bib
 link-citations: true
 ---
 
-# Leitura recomendada
+# Leituras recomendadas
 
-Este arquivo reúne os materiais citados nas apresentações do curso. As referências bibliográficas de artigos e livros estão cadastradas em [`bibliography.bib`](../bibliography.bib). Os números de slide indicam onde cada material aparece na apresentação original.
+Esta página reúne os artigos, tutoriais, vídeos e sites citados nas apresentações e os materiais complementares diretamente associados a cada aula. A organização por aula preserva a apresentação em que cada recurso é referenciado. A bibliografia completa dos artigos está cadastrada em [`bibliography.bib`](../bibliography.bib).
 
-## Aula 1 — Introdução à transcriptômica espacial {#aula-1}
+## Aula 1 — Introdução às transcriptômicas de alta resolução {#aula-1}
 
-Apresentação: [`Aula1_Introducao_transcriptomica_espacial.pptx`](Aula1_Introducao_transcriptomica_espacial.pptx)
+Apresentação: [slides em HTML](aula01/aula01-slides.html) · [arquivo PowerPoint](aula01/Aula1_Introducao_transcriptomica_espacial.pptx)
 
 ### Artigos científicos {#artigos-cientificos-aula-1}
 
-- [**Full-length mRNA-Seq from single-cell levels of RNA and individual circulating tumor cells**](https://doi.org/10.1038/nbt.2282) — trabalho que apresenta o Smart-seq para obtenção de transcriptomas completos a partir de células individuais. [@Ramskold2012SmartSeq] *(slide 18)*
-- [**Massively parallel digital transcriptional profiling of single cells**](https://doi.org/10.1038/ncomms14049) — descrição da plataforma Chromium para perfil transcricional de células individuais em grande escala. [@Zheng2017Chromium] *(slide 19)*
-- [**Benchmarking full-length transcript single cell mRNA sequencing protocols**](https://doi.org/10.1186/s12864-022-09014-5) — comparação de protocolos de sequenciamento de RNA de célula única com cobertura do transcrito completo. [@Probst2022Benchmarking] *(slides 21 e 26)*
-- [**A practical guide to single-cell RNA-sequencing for biomedical research and clinical applications**](https://doi.org/10.1186/s13073-017-0467-4) — guia introdutório para planejamento experimental, escolha de protocolo, controle de qualidade e análise de scRNA-seq. [@Haque2017PracticalGuide] *(slide 27)*
-- [**A comprehensive analysis framework for evaluating commercial single-cell RNA sequencing technologies**](https://doi.org/10.1093/nar/gkae1186) — avaliação comparativa de tecnologias comerciais de scRNA-seq. [@DeSimone2025Commercial] *(slide 27)*
-- [**Visualization of single RNA transcripts in situ**](https://doi.org/10.1126/science.280.5363.585) — trabalho fundador sobre detecção e quantificação de moléculas individuais de RNA por hibridização *in situ*. [@Femino1998SingleRNA] *(slide 29)*
-- [**Gene expression profiles of laser-captured adjacent neuronal subtypes**](https://doi.org/10.1038/4806) — aplicação de microdissecção a laser e amplificação de RNA para comparar perfis de expressão de populações neuronais adjacentes. [@Luo1999LaserCapture] *(slide 29)*
-- [**Visualization and analysis of gene expression in tissue sections by spatial transcriptomics**](https://doi.org/10.1126/science.aaf2403) — artigo seminal que introduziu a estratégia denominada *spatial transcriptomics*. [@Stahl2016SpatialTranscriptomics] *(slide 30)*
-- [**Method of the Year: spatially resolved transcriptomics**](https://doi.org/10.1038/s41592-020-01033-y) — panorama da transcriptômica espacial como método do ano de 2020 pela *Nature Methods*. [@Marx2021MethodOfTheYear] *(slide 31)*
-- [**Spatial transcriptomics: Technologies, applications and experimental considerations**](https://doi.org/10.1016/j.ygeno.2023.110671) — revisão comparativa de plataformas, aplicações e critérios para planejamento experimental. [@Wang2023SpatialTechnologies] *(slide 32)*
-- [**High-definition spatial transcriptomic profiling of immune cell populations in colorectal cancer**](https://doi.org/10.1038/s41588-025-02193-3) — apresentação e avaliação do Visium HD em amostras de câncer colorretal. [@DeOliveira2025VisiumHD] *(slide 37)*
-- [**The emerging landscape of spatial profiling technologies**](https://doi.org/10.1038/s41576-022-00515-3) — revisão das principais abordagens de perfil molecular espacial e de suas características técnicas. [@Moffitt2022SpatialProfiling] *(slide 39)*
-- [**Current best practices in single-cell RNA-seq analysis: a tutorial**](https://doi.org/10.15252/msb.20188746) — tutorial de boas práticas para pré-processamento e análises posteriores de scRNA-seq. [@Luecken2019BestPractices] *(slide 42)*
-- [**A comprehensive workflow for optimizing RNA-seq data analysis**](https://doi.org/10.1186/s12864-024-10414-y) — fluxo de trabalho para seleção e otimização das etapas de análise de RNA-seq. [@Jiang2024RNASeqWorkflow] *(slide 42)*
-
-### Livro e capítulo on-line {#livro-e-capitulo-on-line-aula-1}
-
-- [**Orchestrating Spatial Transcriptomics Analysis with Bioconductor — Reads to counts**](https://bioconductor.org/books/3.22/OSTA/pages/seq-reads-to-counts.html) — capítulo sobre a transformação das leituras de sequenciamento em matrizes de contagem, incluindo barcodes espaciais, alinhamento, controle de qualidade e contagem. [@Crowell2025OSTA] *(slide 44)*
+- [**A practical guide to single-cell RNA-sequencing for biomedical research and clinical applications**](https://doi.org/10.1186/s13073-017-0467-4) — guia para planejamento experimental, escolha de protocolo, controle de qualidade e análise de scRNA-seq. [@Haque2017PracticalGuide]
+- [**A comprehensive analysis framework for evaluating commercial single-cell RNA sequencing technologies**](https://doi.org/10.1093/nar/gkae1186) — comparação de tecnologias comerciais de scRNA-seq e de seus perfis de desempenho. [@DeSimone2025Commercial]
+- [**High-definition spatial transcriptomic profiling of immune cell populations in colorectal cancer**](https://doi.org/10.1038/s41588-025-02193-3) — aplicação do Visium HD à caracterização espacial de populações imunes em câncer colorretal. [@DeOliveira2025VisiumHD]
+- [**The emerging landscape of spatial profiling technologies**](https://doi.org/10.1038/s41576-022-00515-3) — revisão das principais abordagens de perfil molecular espacial e de suas características técnicas. [@Moffitt2022SpatialProfiling]
 
 ### Tutoriais e documentação {#tutoriais-e-documentacao-aula-1}
 
-- [**Tutorial do RStudio para iniciantes: um guia completo**](https://www.datacamp.com/pt/tutorial/r-studio-tutorial) — versão em português do tutorial introdutório do DataCamp. *(slide 9, hiperlink embutido)*
-- [**Space Ranger Algorithms: Read Processing & Secondary Analysis**](https://www.10xgenomics.com/support/software/space-ranger/latest/algorithms-overview/gene-expression) — documentação oficial sobre processamento de leituras, alinhamento, barcodes, UMIs e análises secundárias do Space Ranger. *(slide 42, hiperlink embutido)*
-- [**Configuração do ambiente do RStudio**](https://flaviogckessler.github.io/Curso_ST/vinhetas/DOC1_Configuracao_do_ambiente_RStudio.html) — vinheta do curso para preparar o ambiente das aulas práticas. *(slide 63, hiperlink embutido)*
-- [**Tutorial: Getting Started with R and RStudio**](https://www.dataquest.io/blog/tutorial-getting-started-with-r-and-rstudio/) — introdução ao R e ao RStudio publicada pelo Dataquest. *(slide 67)*
-- [**Introduction to renv**](https://rstudio.github.io/renv/articles/renv.html) — documentação sobre criação de ambientes reproduzíveis e isolamento das dependências de projetos em R. *(slide 67)*
-- [**RStudio Tutorial for Beginners: A Complete Guide**](https://www.datacamp.com/tutorial/r-studio-tutorial) — versão em inglês do tutorial introdutório do DataCamp. *(slide 67)*
+- [**Tutorial do RStudio para iniciantes: um guia completo**](https://www.datacamp.com/pt/tutorial/r-studio-tutorial) — introdução em português ao RStudio indicada no bloco sobre o ambiente do curso.
+- [**Space Ranger Algorithms: Read Processing & Secondary Analysis**](https://www.10xgenomics.com/support/software/space-ranger/latest/algorithms-overview/gene-expression) — documentação oficial sobre processamento de leituras, alinhamento, barcodes, UMIs e análises secundárias do Space Ranger.
+- [**Configuração do ambiente RStudio**](../vinhetas/Configuracao_do_ambiente_RStudio.html) — vinheta do curso cujo conteúdo é reproduzido no bloco prático final da apresentação.
 
 ### Vídeos {#videos-aula-1}
 
-- [**Single Cell Gene Expression Protocol v3.1: Assemble Chromium Next GEM Chip G**](https://www.youtube.com/watch?v=cH8ldAqKUzE) — demonstração da montagem do chip para o protocolo Chromium Single Cell Gene Expression. *(slide 27)*
-- [**Visium Spatial Gene Expression Protocol**](https://www.youtube.com/playlist?list=PLfaSRwcfHcq1acX1nuTFcUGClpNRPEyHH) — série de vídeos sobre o protocolo Visium Spatial Gene Expression. *(slide 39)*
+- [**Single Cell Gene Expression Protocol v3.1: Assemble Chromium Next GEM Chip G**](https://www.youtube.com/watch?v=cH8ldAqKUzE) — demonstração da montagem do chip para o protocolo Chromium Single Cell Gene Expression.
+- [**Visium Spatial Gene Expression Protocol**](https://www.youtube.com/playlist?list=PLfaSRwcfHcq1acX1nuTFcUGClpNRPEyHH) — série de vídeos sobre o protocolo Visium Spatial Gene Expression.
 
 ### Sites e repositórios {#sites-e-repositorios-aula-1}
 
-- [**Perfil de Flávio Carazza-Kessler no GitHub**](https://github.com/flaviogckessler) *(slide 6, hiperlink embutido)*
-- [**Perfil do SysBioLab no GitHub**](https://github.com/sysbiolab) *(slide 6, hiperlink embutido)*
-- [**Repositório do curso no GitHub**](https://github.com/flaviogckessler/Curso_ST) — apresentações, vinhetas e materiais das atividades práticas. *(slide 62, hiperlink embutido)*
+- [**SysBioLab no GitHub**](https://github.com/sysbiolab) — perfil do laboratório responsável por parte dos pacotes e materiais usados no curso.
 
-## Aula 2 — Pré-processamento e clusterização {#aula-2}
+## Aula 2 — Pré-processamento, clusterização e genes espacialmente variáveis {#aula-2}
 
-Apresentação: [`Aula2_Aula_PreProcessamento_Clusterizacao.pptx`](Aula2_Aula_PreProcessamento_Clusterizacao.pptx)
+Apresentação: [slides em HTML](aula02/aula02-slides.html) · [fonte em Quarto](aula02/aula02.qmd) · [roteiro em HTML](aula02/aula02-roteiro.html)
 
 ### Artigos científicos {#artigos-cientificos-aula-2}
 
-- [**Review of single-cell RNA-seq data clustering for cell-type identification and characterization**](https://doi.org/10.1261/rna.078965.121) — revisão dos principais métodos de clusterização usados para identificar e caracterizar tipos celulares em dados de scRNA-seq. [@Zhang2023Clustering] *(slide 40)*
-- [**SpatialExperiment: infrastructure for spatially-resolved transcriptomics data in R using Bioconductor**](https://doi.org/10.1093/bioinformatics/btac299) — apresenta a classe `SpatialExperiment` e sua infraestrutura para representar e manipular dados de transcriptômica espacial no Bioconductor. [@Righelli2022SpatialExperiment] *(slide 57)*
-- [**Museum of spatial transcriptomics**](https://doi.org/10.1038/s41592-022-01409-2) — panorama comparativo das tecnologias de transcriptômica espacial e de suas resoluções, escalas e aplicações. [@Moses2022Museum] *(slide 57)*
-
-### Livro e capítulo on-line {#livro-e-capitulo-on-line-aula-2}
-
-- [**Biologia molecular da célula**](https://app.minhabiblioteca.com.br/books/9788582714232) — livro-texto de referência para os fundamentos de biologia celular e molecular abordados na aula. [@Alberts2017Biologia] *(slide 17)*
+- [**Comprehensive Integration of Single-Cell Data**](https://doi.org/10.1016/j.cell.2019.05.031) — artigo do Seurat v3 sobre integração de conjuntos de dados de célula única. [@Stuart2019Seurat]
+- [**Normalization and variance stabilization of single-cell RNA-seq data using regularized negative binomial regression**](https://doi.org/10.1186/s13059-019-1874-1) — trabalho que apresenta o SCTransform para normalização e estabilização da variância. [@Hafemeister2019SCTransform]
+- [**SpatialDE: identification of spatially variable genes**](https://doi.org/10.1038/nmeth.4636) — método baseado em processos gaussianos para identificar genes com variação espacial. [@Svensson2018SpatialDE]
+- [**SPARK-X: non-parametric modeling enables scalable and robust detection of spatial expression patterns for large spatial transcriptomic studies**](https://doi.org/10.1186/s13059-021-02404-0) — método não paramétrico e escalável para detectar padrões espaciais de expressão. [@Zhu2021SPARKX]
+- [**nnSVG for the scalable identification of spatially variable genes using nearest-neighbor Gaussian processes**](https://doi.org/10.1038/s41467-023-39748-z) — abordagem baseada em processos gaussianos com aproximação por vizinhos. [@Weber2023NnSVG]
+- [**Disparities in spatially variable gene calling highlight the need for benchmarking spatial transcriptomics methods**](https://doi.org/10.1186/s13059-023-03045-1) — mostra a baixa concordância entre métodos e discute a necessidade de benchmarks. [@Charitakis2023SVGCalling]
+- [**Evaluating spatially variable gene detection methods for spatial transcriptomics data**](https://doi.org/10.1186/s13059-023-03145-y) — avaliação de precisão, robustez, significância estatística e desempenho computacional de detectores de SVGs. [@Chen2024SVGEvaluation]
+- [**Categorization of 34 computational methods to detect spatially variable genes from spatially resolved transcriptomics data**](https://doi.org/10.1038/s41467-025-56080-w) — organiza os métodos em SVGs globais, específicos de tipo celular e marcadores de domínios espaciais. [@Yan2025SVGMethods]
+- [**Systematic benchmarking of computational methods to identify spatially variable genes**](https://doi.org/10.1186/s13059-025-03731-2) — benchmark sistemático de métodos de identificação de SVGs em diferentes tecnologias e cenários. [@Li2025SVGBenchmark]
+- [**Benchmarking cell-type-specific spatially variable gene detection methods**](https://doi.org/10.1093/bib/bbag190) — comparação de métodos para detectar SVGs específicos de tipos celulares. [@Yao2026CtSVGBenchmark]
+- [**Benchmarking computational methods for detecting spatial domains and domain-specific spatially variable genes from spatial transcriptomics data**](https://doi.org/10.1093/nar/gkaf303) — benchmark conjunto de domínios espaciais e genes marcadores desses domínios. [@Kang2025SpatialDomains]
+- [**Protocol for assessing distances in pathway space for classifier feature sets from machine learning methods**](https://doi.org/10.1016/j.xpro.2025.103681) — protocolo do PathwaySpace, usado na aula para projeção contínua de sinais no tecido. [@Tercan2025PathwaySpace]
+- [**RGraphSpace: Rendering graphs as coherent spatial objects in ggplot2**](https://doi.org/10.21105/joss.11209) — descrição do RGraphSpace e de sua representação coerente de grafos e dados espaciais no ggplot2. [@RGraphSpace2026]
 
 ### Tutoriais e documentação {#tutoriais-e-documentacao-aula-2}
 
-- [**Seurat — documentação e vinhetas**](https://satijalab.org/seurat/) — documentação oficial do pacote para controle de qualidade, análise, clusterização e exploração de dados de expressão gênica em célula única e no espaço. *(slide 13)*
-- [**Seurat — Interaction Tips**](https://satijalab.org/seurat/archive/v4.3/interaction_vignette) — vinheta do Seurat 4.3 sobre identidades, metadados, seleção de células e inspeção de objetos. *(slide 14)*
-- [**Understanding Seurat objects — simply explained!**](https://biostatsquid.com/seurat-objects-explained/) — explicação visual da estrutura interna de objetos Seurat e de seus principais componentes. *(slides 14 e 33)*
-- [**Z-transformation**](http://www.statistics4u.info/fundstat_eng/ee_ztransform.html) — introdução à transformação em escore-z e à padronização de variáveis. *(slide 32)*
-- [**What is Dimensionality Reduction? A Guide**](https://blog.roboflow.com/what-is-dimensionality-reduction/) — introdução conceitual à redução de dimensionalidade e às suas aplicações. *(slide 37)*
-- [**RGraphSpace — Get started**](https://sysbiolab.github.io/RGraphSpace/articles/get-started.html) — guia inicial para representar redes e seus atributos gráficos com o pacote RGraphSpace. *(slide 94, hiperlink embutido)*
-- [**PathwaySpace — Get started**](https://sysbiolab.github.io/PathwaySpace/articles/get-started.html) — guia inicial do pacote para projeção e visualização de sinais de redes em espaços bidimensionais. *(slides 107 a 109, hiperlink embutido)*
-- [**Controle de qualidade, pré-processamento e clusterização espacial**](https://flaviogckessler.github.io/Curso_ST/vinhetas/Controle_de_qualidade_preprocessamento_clusterizacao_espacial.html) — vinheta prática da Aula 2 para preparar, avaliar e clusterizar dados de transcriptômica espacial. *(slide 5)*
-- [**Visualização contínua com PathwaySpace**](https://flaviogckessler.github.io/Curso_ST/vinhetas/Visualizacao_Continua_PathwaySpace.html) — vinheta prática da Aula 2 para projetar e explorar sinais contínuos com PathwaySpace. *(slide 86)*
+- [**Controle de qualidade, pré-processamento e clusterização de dados espaciais**](../vinhetas/Controle_de_qualidade_preprocessamento_clusterizacao_espacial.html) — vinheta do curso para preparar, avaliar, normalizar e clusterizar dados Visium.
+- [**Visualização contínua de dados espaciais com PathwaySpace**](../vinhetas/Visualizacao_Continua_PathwaySpace.html) — atividade prática de projeção e exploração de sinais contínuos.
+- [**Analysis, visualization, and integration of spatial datasets with Seurat**](https://satijalab.org/seurat/articles/spatial_vignette) — vinheta oficial do Seurat para análise de dados espaciais.
+- [**RGraphSpace: Spatial Feature Data**](https://sysbiolab.github.io/RGraphSpace/articles/spatial-data.html) — vinheta sobre imagens, coordenadas e atributos moleculares em objetos espaciais.
+- [**PathwaySpace: Visualizing spatial transcriptomics**](https://sysbiolab.github.io/PathwaySpace/articles/spatial-transcriptomics.html) — vinheta sobre a projeção de sinais de transcriptômica espacial.
 
 ### Sites e repositórios {#sites-e-repositorios-aula-2}
 
-- [**PathwaySpace**](https://sysbiolab.github.io/PathwaySpace/) — site oficial do pacote, com instalação, referência de funções e vinhetas. *(slides 84 e 85)*
+- [**Seurat**](https://satijalab.org/seurat/) — documentação do pacote usado no fluxo de controle de qualidade, normalização, redução de dimensionalidade e clusterização.
+- [**RGraphSpace**](https://sysbiolab.github.io/RGraphSpace/) — documentação do pacote usado para representar dados espaciais como objetos gráficos coerentes.
+- [**PathwaySpace**](https://sysbiolab.github.io/PathwaySpace/) — documentação do pacote usado para projeção contínua de sinais no espaço do tecido.
 
-## Aula 3 — Análises downstream de RNA-seq espacial {#aula-3}
+## Aula 3 — Análises downstream de transcriptômica espacial {#aula-3}
 
-Apresentação: [`Aula3_Analise_downstream_RNAseq_espacial.pptx`](Aula3_Analise_downstream_RNAseq_espacial.pptx)
+Apresentação: [slides em HTML](aula03/aula03-slides.html) · [fonte em Quarto](aula03/aula03.qmd) · [roteiro em HTML](aula03/aula03-roteiro.html)
 
 ### Artigos científicos {#artigos-cientificos-aula-3}
 
-- [**Robust decomposition of cell type mixtures in spatial transcriptomics**](https://doi.org/10.1038/s41587-021-00830-w) — apresenta o RCTD para deconvolução e anotação dos tipos celulares presentes em spots de transcriptômica espacial. [@Cable2022RCTD] *(slides 8 e 171)*
-- [**Adult mouse cortical cell taxonomy revealed by single cell transcriptomics**](https://doi.org/10.1038/nn.4216) — descreve a taxonomia de tipos celulares do córtex de camundongo usada como referência na análise com RCTD. [@Tasic2016] *(slide 13)*
-- [**Inference and analysis of cell-cell communication using CellChat**](https://doi.org/10.1038/s41467-021-21246-9) — artigo original do CellChat para inferir redes de comunicação celular a partir de dados transcriptômicos. [@Jin2021CellChat] *(slides 76 e 77)*
-- [**CellChat for systematic analysis of cell-cell communication from single-cell transcriptomics**](https://doi.org/10.1038/s41596-024-01045-4) — protocolo detalhado para análises de comunicação celular com o CellChat. [@Jin2025CellChat] *(slide 77)*
-- [**High-definition spatial transcriptomic profiling of immune cell populations in colorectal cancer**](https://doi.org/10.1038/s41588-025-02193-3) — aplicação do Visium HD à caracterização de populações imunes e à segmentação celular em câncer colorretal. [@DeOliveira2025VisiumHD] *(slides 137 e 138)*
-- [**Cell2location maps fine-grained cell types in spatial transcriptomics**](https://doi.org/10.1038/s41587-021-01139-4) — método probabilístico para mapear tipos celulares detalhados de uma referência de célula única em dados espaciais. [@Kleshchevnikov2022Cell2location] *(slide 171)*
-- [**SpatialDE: identification of spatially variable genes**](https://doi.org/10.1038/nmeth.4636) — método para identificar genes cuja expressão varia de forma dependente da localização espacial. [@Svensson2018SpatialDE] *(slide 172)*
-- [**nnSVG for the scalable identification of spatially variable genes using nearest-neighbor Gaussian processes**](https://doi.org/10.1038/s41467-023-39748-z) — abordagem escalável baseada em processos gaussianos para detectar genes espacialmente variáveis. [@Weber2023NnSVG] *(slide 172)*
-- [**SPARK-X: non-parametric modeling enables scalable and robust detection of spatial expression patterns for large spatial transcriptomic studies**](https://doi.org/10.1186/s13059-021-02404-0) — método não paramétrico para detectar padrões espaciais de expressão em conjuntos de dados de grande escala. [@Zhu2021SPARKX] *(slide 172)*
-- [**Modeling intercellular communication in tissues using spatial graphs of cells**](https://doi.org/10.1038/s41587-022-01467-z) — apresenta o NCEM para modelar como a composição da vizinhança celular influencia a expressão gênica. [@Fischer2023NCEM] *(slides 174 e 175)*
-- [**Reconstruction of the tumor spatial microenvironment along the malignant-boundary-nonmalignant axis**](https://doi.org/10.1038/s41467-023-36560-7) — descreve o Cottrazm para investigar microambientes tumorais e a transição entre regiões malignas e não malignas. [@Xun2023TumorMicroenvironment] *(slides 174 e 175)*
-- [**Squidpy: a scalable framework for spatial omics analysis**](https://doi.org/10.1038/s41592-021-01358-2) — ecossistema em Python para análise e visualização escalável de dados ômicos espaciais. [@Palla2022Squidpy] *(slide 176)*
-- [**Giotto: a toolbox for integrative analysis and visualization of spatial expression data**](https://doi.org/10.1186/s13059-021-02286-2) — conjunto de ferramentas para análise integrada, exploração e visualização de dados de expressão espacial. [@Dries2021Giotto] *(slide 176)*
-- [**Spatial transcriptomic alignment, integration, and 3D reconstruction by STAIR**](https://doi.org/10.1186/s13059-025-03895-x) — método para alinhar e integrar cortes histológicos na reconstrução tridimensional de tecidos. [@Yu2025STAIR] *(slide 177)*
-- [**Temporal and spatial omics technologies for 4D profiling**](https://doi.org/10.1038/s41592-025-02683-6) — perspectiva sobre a integração de dados espaciais tridimensionais com informação temporal. [@Reynolds2025FourD] *(slide 178)*
-- [**Systematic comparison of sequencing-based spatial transcriptomic methods**](https://doi.org/10.1038/s41592-024-02325-3) — comparação sistemática de 11 tecnologias de transcriptômica espacial baseadas em sequenciamento. [@You2024SpatialMethods] *(slide 179)*
+- [**Robust decomposition of cell type mixtures in spatial transcriptomics**](https://doi.org/10.1038/s41587-021-00830-w) — apresenta o RCTD para estimar os tipos celulares presentes em spots de transcriptômica espacial. [@Cable2022RCTD]
+- [**Inference and analysis of cell-cell communication using CellChat**](https://doi.org/10.1038/s41467-021-21246-9) — artigo original do CellChat para inferir redes de comunicação celular a partir de dados transcriptômicos. [@Jin2021CellChat]
+- [**CellChat for systematic analysis of cell-cell communication from single-cell transcriptomics**](https://doi.org/10.1038/s41596-024-01045-4) — protocolo detalhado para análise de comunicação celular com CellChat. [@Jin2025CellChat]
+- [**Protocol for assessing distances in pathway space for classifier feature sets from machine learning methods**](https://doi.org/10.1016/j.xpro.2025.103681) — protocolo do PathwaySpace, aplicado na aula à projeção espacial de sinais de comunicação. [@Tercan2025PathwaySpace]
+- [**High-definition spatial transcriptomic profiling of immune cell populations in colorectal cancer**](https://doi.org/10.1038/s41588-025-02193-3) — aplicação do Visium HD à caracterização de populações imunes e à segmentação celular. [@DeOliveira2025VisiumHD]
+- [**RGraphSpace: Rendering graphs as coherent spatial objects in ggplot2**](https://doi.org/10.21105/joss.11209) — artigo do pacote usado para manter expressão, posição, imagem e geometria celular alinhadas. [@RGraphSpace2026]
+- [**Cell2location maps fine-grained cell types in spatial transcriptomics**](https://doi.org/10.1038/s41587-021-01139-4) — método probabilístico para mapear tipos celulares detalhados de uma referência de célula única. [@Kleshchevnikov2022Cell2location]
+- [**SpatialDE: identification of spatially variable genes**](https://doi.org/10.1038/nmeth.4636) — método baseado em processos gaussianos para detectar variação espacial da expressão. [@Svensson2018SpatialDE]
+- [**nnSVG for the scalable identification of spatially variable genes using nearest-neighbor Gaussian processes**](https://doi.org/10.1038/s41467-023-39748-z) — abordagem escalável para identificar genes espacialmente variáveis. [@Weber2023NnSVG]
+- [**SPARK-X: non-parametric modeling enables scalable and robust detection of spatial expression patterns for large spatial transcriptomic studies**](https://doi.org/10.1186/s13059-021-02404-0) — teste não paramétrico para padrões espaciais em conjuntos de grande escala. [@Zhu2021SPARKX]
+- [**Modeling intercellular communication in tissues using spatial graphs of cells**](https://doi.org/10.1038/s41587-022-01467-z) — apresenta o NCEM para modelar o efeito da vizinhança celular sobre a expressão gênica. [@Fischer2023NCEM]
+- [**Reconstruction of the tumor spatial microenvironment along the malignant-boundary-nonmalignant axis**](https://doi.org/10.1038/s41467-023-36560-7) — descreve o Cottrazm para investigar microambientes tumorais e suas regiões de transição. [@Xun2023TumorMicroenvironment]
+- [**Squidpy: a scalable framework for spatial omics analysis**](https://doi.org/10.1038/s41592-021-01358-2) — ecossistema em Python para análise e visualização escalável de dados ômicos espaciais. [@Palla2022Squidpy]
+- [**Giotto: a toolbox for integrative analysis and visualization of spatial expression data**](https://doi.org/10.1186/s13059-021-02286-2) — conjunto de ferramentas para análise integrada e visualização de dados espaciais. [@Dries2021Giotto]
+- [**Spatial transcriptomic alignment, integration, and 3D reconstruction by STAIR**](https://doi.org/10.1186/s13059-025-03895-x) — método para alinhar e integrar cortes histológicos em reconstruções tridimensionais. [@Yu2025STAIR]
+- [**Temporal and spatial omics technologies for 4D profiling**](https://doi.org/10.1038/s41592-025-02683-6) — perspectiva sobre a integração de informação espacial tridimensional e dinâmica temporal. [@Reynolds2025FourD]
+- [**Systematic comparison of sequencing-based spatial transcriptomic methods**](https://doi.org/10.1038/s41592-024-02325-3) — comparação sistemática de tecnologias de transcriptômica espacial baseadas em sequenciamento. [@You2024SpatialMethods]
 
 ### Tutoriais e documentação {#tutoriais-e-documentacao-aula-3}
 
-- [**Deconvolução com RCTD**](https://flaviogckessler.github.io/Curso_ST/vinhetas/RCTD_Deconvolution_stxbrain.html) — vinheta prática da Aula 3 para estimar a composição celular dos spots. *(slide 10)*
-- [**Comunicação celular com CellChat e PathwaySpace**](https://flaviogckessler.github.io/Curso_ST/vinhetas/CellChat_Comunicacao_Celular_PathwaySpace.html) — vinheta prática para inferir e visualizar redes de comunicação celular. *(slide 84)*
-- [**Cell segmentation in spatial transcriptomics**](https://sysbiolab.github.io/RGraphSpace/articles/spatial-segmentation2.html) — tutorial do RGraphSpace para representar células segmentadas em dados espaciais de alta resolução. *(slide 142)*
-- [**Segmentação celular**](https://flaviogckessler.github.io/Curso_ST/vinhetas/Segmentacao_Celular.html) — vinheta prática da Aula 3 sobre análise de dados com segmentação celular. *(slide 143)*
-- [**Instalação dos dados Xenium para RGraphSpace**](https://flaviogckessler.github.io/Curso_ST/vinhetas/Instalacao_dados_Xenium_RGraphSpace.html) — instruções para obter e preparar o conjunto de dados Xenium usado na atividade de segmentação. *(slide 145)*
+- [**Deconvolução com RCTD**](../vinhetas/RCTD_Deconvolution_stxbrain.html) — vinheta prática para estimar a composição celular dos spots.
+- [**Comunicação celular com CellChat e PathwaySpace**](../vinhetas/CellChat_Comunicacao_Celular_PathwaySpace.html) — vinheta prática para inferir e visualizar redes de comunicação celular.
+- [**Segmentação celular em dados Visium HD**](../vinhetas/Segmentacao_Celular_VisiumHD.html) — atividade prática sobre geometrias celulares e expressão em dados de alta resolução.
+- [**RCTD Tutorial**](https://bioconductor.uib.no/packages/3.22/bioc/vignettes/spacexr/inst/doc/rctd-tutorial.html) — tutorial do pacote spacexr para execução e interpretação do RCTD.
+- [**CellChat inference and analysis of spatially proximal cell-cell communication**](https://htmlpreview.github.io/?https://github.com/jinworks/CellChat/blob/master/tutorial/CellChat_analysis_of_spatial_transcriptomics_data.html) — tutorial de CellChat para dados com informação espacial.
+- [**Spatial-segmented data with Seurat and RGraphSpace**](https://sysbiolab.github.io/RGraphSpace/articles/spatial-segmentation1.html) — vinheta sobre dados segmentados e sua representação com Seurat e RGraphSpace.
 
 ### Sites e repositórios {#sites-e-repositorios-aula-3}
 
-- [**spacexr**](https://github.com/dmcable/spacexr) — implementação do RCTD e de métodos relacionados para análise de transcriptômica espacial. *(slide 171, hiperlink embutido)*
-- [**cell2location**](https://github.com/BayraktarLab/cell2location) — código, documentação e exemplos do método cell2location. *(slide 171, hiperlink embutido)*
-- [**SpatialDE**](https://github.com/teichlab/spatialde) — repositório do método para identificação de genes espacialmente variáveis. *(slide 172, hiperlink embutido)*
-- [**nnSVG**](https://github.com/lmweber/nnSVG) — implementação em R e documentação do nnSVG. *(slide 172, hiperlink embutido)*
-- [**SPARK**](https://github.com/xzhoulab/SPARK) — repositório dos métodos SPARK e SPARK-X para análise de padrões espaciais de expressão. *(slide 172, hiperlink embutido)*
-- [**NCEM**](https://github.com/theislab/ncem) — implementação dos modelos de expressão centrados em nós para estudar comunicação intercelular. *(slides 174 e 175, hiperlink embutido)*
-- [**Cottrazm**](https://github.com/Yelab2020/Cottrazm) — código do método para reconstrução e análise do microambiente espacial tumoral. *(slides 174 e 175, hiperlink embutido)*
-- [**Squidpy**](https://github.com/scverse/squidpy) — repositório do framework de análise de dados ômicos espaciais em Python. *(slide 176, hiperlink embutido)*
-- [**Giotto Suite**](https://giottosuite.com/) — portal oficial com documentação e recursos do ecossistema Giotto. *(slide 176, hiperlink embutido)*
-- [**STAIR**](https://github.com/yuyuanyuana/STAIR) — implementação do método de alinhamento, integração e reconstrução espacial em 3D. *(slide 177, hiperlink embutido)*
+- [**SysBioLab no GitHub**](https://github.com/sysbiolab) — código dos pacotes e projetos do laboratório citado nos créditos da apresentação.
+- [**Laboratório de Bioinformática e Biologia de Sistemas da UFPR**](https://bioinfo.ufpr.br) — página institucional citada nos créditos da apresentação.
 
 ## Referências {#referencias}
 

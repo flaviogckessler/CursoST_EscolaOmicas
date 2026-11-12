@@ -112,9 +112,9 @@ As vinhetas do curso apresentam os temas apresentados nas aulas de maneira indiv
 
 ## Leituras recomendadas
 
-Os artigos científicos, capítulos, tutoriais, vídeos e repositórios citados nas apresentações estão reunidos em uma página pesquisável, organizada por tipo de material e vinculada aos slides correspondentes da Aula 1.
+Os artigos científicos, tutoriais, vídeos e sites citados nas apresentações estão reunidos em uma página pesquisável, organizada por tipo de material e pela aula em que cada recurso é referenciado.
 
--   [Explorar as leituras recomendadas no GitHub Pages](https://flaviogckessler.github.io/Curso_ST/apresentacoes/LEITURA_RECOMENDADA.html)
+-   [Explorar as leituras recomendadas no GitHub Pages](https://flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/LEITURA_RECOMENDADA.html)
 -   [Consultar a lista em Markdown](apresentacoes/LEITURA_RECOMENDADA.md)
 
 ## Ministrantes

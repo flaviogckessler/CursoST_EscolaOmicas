@@ -1422,7 +1422,7 @@ A escolha depende de resolução, área, sensibilidade, compatibilidade com hist
 
 Material complementar do curso:
 
-[flaviogckessler.github.io/Curso_ST/apresentacoes/LEITURA_RECOMENDADA.html](https://flaviogckessler.github.io/Curso_ST/apresentacoes/LEITURA_RECOMENDADA.html)
+[flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/LEITURA_RECOMENDADA.html](https://flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/LEITURA_RECOMENDADA.html)
 
 Priorize a leitura da documentação do método, do artigo original e de benchmarks independentes.
 

@@ -83,7 +83,7 @@ kbd { padding: .1rem .42rem; border: 1px solid var(--line); border-bottom-width:
 .resource-card > a:first-child:hover { color: var(--teal-dark); }
 .resource-card p { margin: 0; }
 .citation { color: var(--teal-dark); font-size: .88em; white-space: nowrap; }
-.slide-badge { display: inline-block; margin: .7rem .15rem 0 0; padding: .2rem .55rem; border-radius: 6px; color: #91411f; background: #fff0e9; font-size: .74rem; font-style: normal; font-weight: 750; white-space: nowrap; }
+.presentation-badge { display: inline-block; margin: .85rem .15rem 0 0; padding: .2rem .55rem; border-radius: 6px; color: #0b645f; background: #e5f7f5; font-size: .74rem; font-style: normal; font-weight: 750; white-space: nowrap; }
 
 #referencias { margin-top: 5rem; padding-top: 2rem; border-top: 2px solid var(--navy); }
 #refs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 2rem; font-size: .9rem; color: #43586a; }

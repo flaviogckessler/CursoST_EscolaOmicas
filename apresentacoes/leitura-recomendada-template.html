@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Leituras recomendadas do curso Análise de Dados de Transcriptômica Espacial, organizadas por formato e vinculadas aos slides das Aulas 1, 2 e 3.">
+  <meta name="description" content="Leituras recomendadas do curso Transcriptômica Espacial em Ambiente R, organizadas por formato e associadas às apresentações das Aulas 1, 2 e 3.">
   <meta name="theme-color" content="#0b1f33">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:title" content="$title$">
-  <meta property="og:description" content="Artigos, livros, tutoriais, vídeos e recursos citados no curso, com acesso direto às fontes.">
-  <meta property="og:url" content="https://flaviogckessler.github.io/Curso_ST/apresentacoes/LEITURA_RECOMENDADA.html">
-  <link rel="canonical" href="https://flaviogckessler.github.io/Curso_ST/apresentacoes/LEITURA_RECOMENDADA.html">
+  <meta property="og:description" content="Artigos, tutoriais, vídeos e recursos citados no curso, com acesso direto às fontes.">
+  <meta property="og:url" content="https://flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/LEITURA_RECOMENDADA.html">
+  <link rel="canonical" href="https://flaviogckessler.github.io/CursoST_EscolaOmicas/apresentacoes/LEITURA_RECOMENDADA.html">
   $for(css)$
   <link rel="stylesheet" href="$css$">
   $endfor$
@@ -22,10 +22,10 @@ $styles.html()$
 <body>
   <a class="skip-link" href="#conteudo">Ir para as leituras</a>
   <header class="site-header">
-    <a class="brand" href="https://flaviogckessler.github.io/Curso_ST/" aria-label="Página inicial do curso">
-      <span><strong>Curso_ST</strong><small>Transcriptômica espacial</small></span>
+    <a class="brand" href="https://flaviogckessler.github.io/CursoST_EscolaOmicas/" aria-label="Página inicial do curso">
+      <span><strong>Curso ST</strong><small>Escola de Ômicas · RSG-Brazil</small></span>
     </a>
-    <a class="repo-link" href="https://github.com/flaviogckessler/Curso_ST">Ver repositório <span aria-hidden="true">↗</span></a>
+    <a class="repo-link" href="https://github.com/flaviogckessler/CursoST_EscolaOmicas">Ver repositório <span aria-hidden="true">↗</span></a>
   </header>
 
   <section class="hero" aria-labelledby="page-title">
@@ -35,8 +35,8 @@ $styles.html()$
       <h1 id="page-title">Leituras<br><em>recomendadas</em></h1>
       <p class="hero-intro">Artigos fundamentais, revisões, tutoriais e recursos para aprofundar os conceitos apresentados nas três primeiras aulas do curso.</p>
       <dl class="hero-stats" aria-label="Resumo da coleção">
-        <div><dt id="total-resources">71</dt><dd>recursos</dd></div>
-        <div><dt>5</dt><dd>formatos</dd></div>
+        <div><dt id="total-resources">0</dt><dd>recursos</dd></div>
+        <div><dt id="total-formats">0</dt><dd>formatos</dd></div>
         <div><dt>3</dt><dd>aulas mapeadas</dd></div>
       </dl>
     </div>
@@ -62,7 +62,6 @@ $styles.html()$
         <div class="filters" role="group" aria-label="Filtrar por formato">
           <button class="filter active" type="button" data-filter="all" aria-pressed="true">Todos</button>
           <button class="filter" type="button" data-filter="artigos-cientificos" aria-pressed="false">Artigos</button>
-          <button class="filter" type="button" data-filter="livro-e-capitulo-on-line" aria-pressed="false">Livro</button>
           <button class="filter" type="button" data-filter="tutoriais-e-documentacao" aria-pressed="false">Tutoriais</button>
           <button class="filter" type="button" data-filter="videos" aria-pressed="false">Vídeos</button>
           <button class="filter" type="button" data-filter="sites-e-repositorios" aria-pressed="false">Sites</button>
@@ -82,8 +81,8 @@ $body$
   </div>
 
   <footer>
-    <p>Material complementar do curso <strong>Análise de Dados de Transcriptômica Espacial</strong>.</p>
-    <a href="https://github.com/flaviogckessler/Curso_ST">GitHub</a>
+    <p>Material complementar do curso <strong>Transcriptômica Espacial em Ambiente R</strong>.</p>
+    <a href="https://github.com/flaviogckessler/CursoST_EscolaOmicas">GitHub</a>
   </footer>
 
   <script>
@@ -93,51 +92,58 @@ $body$
       const introHeading = source.querySelector(':scope > h1');
       if (introHeading) introHeading.remove();
 
+      const findPresentationHeading = (heading) => {
+        let node = heading.previousElementSibling;
+        while (node && node.tagName !== 'H2') node = node.previousElementSibling;
+        return node;
+      };
+
       const resourceSections = [...source.querySelectorAll('h3')].map((heading) => {
         const list = heading.nextElementSibling;
         const id = heading.id;
         const category = id.replace(/-aula-\d+$$/, '');
         if (!list || list.tagName !== 'UL') return null;
+        const presentationHeading = findPresentationHeading(heading);
+        const presentation = presentationHeading?.textContent.trim().match(/^Aula\s+\d+/i)?.[0] || 'apresentação do curso';
         list.classList.add('resource-grid');
         const items = [...list.querySelectorAll(':scope > li')];
         items.forEach((item, index) => {
           item.classList.add('resource-card');
           item.dataset.category = category;
-          const link = item.querySelector('a');
-          if (link) {
+          item.querySelectorAll('a').forEach((link) => {
+            if (link.getAttribute('href')?.startsWith('#')) return;
             link.setAttribute('target', '_blank');
             link.setAttribute('rel', 'noopener noreferrer');
             link.setAttribute('aria-label', link.textContent.trim() + ' (abre em nova aba)');
-          }
-          const slideText = item.textContent.match(/\(slides?[^)]*\)/i);
-          if (slideText) {
-            const walker = document.createTreeWalker(item, NodeFilter.SHOW_TEXT);
-            let node;
-            while ((node = walker.nextNode())) {
-              if (node.nodeValue.includes(slideText[0])) {
-                const parts = node.nodeValue.split(slideText[0]);
-                const fragment = document.createDocumentFragment();
-                fragment.append(parts[0]);
-                const badge = document.createElement('span');
-                badge.className = 'slide-badge';
-                badge.textContent = slideText[0].slice(1, -1);
-                fragment.append(badge, parts.slice(1).join(slideText[0]));
-                node.replaceWith(fragment);
-                break;
-              }
-            }
-          }
+          });
+          const badge = document.createElement('span');
+          badge.className = 'presentation-badge';
+          badge.textContent = 'Referenciado em ' + presentation;
+          item.append(badge);
           item.style.setProperty('--i', index);
         });
-        return { heading, list, id, items };
+        return { heading, list, id, items, presentationHeading };
       }).filter(Boolean);
 
       const cards = resourceSections.flatMap((section) => section.items);
       document.getElementById('total-resources').textContent = cards.length;
+      document.getElementById('total-formats').textContent = new Set(cards.map((card) => card.dataset.category)).size;
       const search = document.getElementById('search');
-      const filters = [...document.querySelectorAll('.filter')];
+      const availableCategories = new Set(cards.map((card) => card.dataset.category));
+      const filterButtons = [...document.querySelectorAll('.filter')];
+      filterButtons.forEach((button) => {
+        button.hidden = button.dataset.filter !== 'all' && !availableCategories.has(button.dataset.filter);
+      });
+      const filters = filterButtons.filter((button) => !button.hidden);
       const count = document.getElementById('result-count');
       const empty = document.getElementById('empty-state');
+      const lessons = [...source.querySelectorAll(':scope > h2')]
+        .filter((heading) => /^Aula\s+\d+/i.test(heading.textContent.trim()))
+        .map((heading) => ({
+          heading,
+          lead: heading.nextElementSibling?.tagName === 'P' ? heading.nextElementSibling : null,
+          sections: resourceSections.filter((section) => section.presentationHeading === heading)
+        }));
       let activeFilter = 'all';
 
       function update() {
@@ -153,6 +159,11 @@ $body$
           const show = items.some((item) => !item.hidden);
           heading.hidden = !show;
           list.hidden = !show;
+        });
+        lessons.forEach(({ heading, lead, sections }) => {
+          const show = sections.some(({ items }) => items.some((item) => !item.hidden));
+          heading.hidden = !show;
+          if (lead) lead.hidden = !show;
         });
         count.textContent = visible + ' ' + (visible === 1 ? 'recurso exibido' : 'recursos exibidos');
         empty.hidden = visible !== 0;
