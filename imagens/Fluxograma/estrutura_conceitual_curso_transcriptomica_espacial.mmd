@@ -1,0 +1,83 @@
+%% Estrutura conceitual editável do curso
+%% Atualizado a partir das três apresentações, dos roteiros e das vinhetas.
+%% Convenção: laranja = dado utilizado; azul = etapa analítica;
+%% verde = objeto/dado gerado; roxo = figura gerada; cinza = conceito/suporte.
+flowchart TB
+  classDef support fill:#EEF2FF,stroke:#51648C,color:#17223B,stroke-width:1.5px;
+  classDef concept fill:#F4F7FB,stroke:#6D7D94,color:#17223B,stroke-width:1.5px;
+  classDef used fill:#FFF7E8,stroke:#B97912,color:#4A2B00,stroke-width:1.5px;
+  classDef process fill:#EAF4FF,stroke:#1F6E9C,color:#11364A,stroke-width:2px;
+  classDef generated fill:#EAF8EF,stroke:#2F855A,color:#153C28,stroke-width:1.5px;
+  classDef figure fill:#F3ECFF,stroke:#7251A3,color:#35234F,stroke-width:1.5px;
+
+  SUP["SUPORTE TRANSVERSAL<br/>Ementa · 3 apresentações<br/>2 roteiros · vinhetas · leituras<br/>referências · QR codes"]:::support
+
+  subgraph A1["AULA 1 · 3 h"]
+    direction LR
+    FUND["FUNDAMENTOS<br/>bulk × scRNA-seq × espacial<br/>NGS · Visium · Visium HD · Xenium<br/>estrutura e resolução dos dados"]:::concept
+    SETUP["PREPARAÇÃO DO AMBIENTE<br/>R ≥ 4.5 · RStudio · Seurat · RGraphSpace<br/>PathwaySpace · CellChat · spacexr"]:::process
+    ENV["RESULTADO<br/>ambiente validado e mapa conceitual<br/>para os fluxos das Aulas 2 e 3"]:::generated
+    FUND --> SETUP --> ENV
+  end
+
+  subgraph A2["AULA 2 · 3 h"]
+    direction LR
+    STX["DADO UTILIZADO<br/>stxBrain · Visium de cérebro de camundongo<br/>anterior1 na aula · anterior1 + posterior1 na vinheta"]:::used
+    PREP["AULA E ROTEIRO<br/>QC · filtros de genes/spots · LogNormalize<br/>genes variáveis · ScaleData"]:::process
+    DIM["ESTRUTURA DOS DADOS<br/>PCA · UMAP · vizinhança<br/>Louvain · clusters espaciais"]:::process
+    GENES["SINAIS BIOLÓGICOS<br/>DEG entre clusters × SVG<br/>Moran's I · genes espaciais"]:::process
+    SPACE["VISUALIZAÇÃO CONTÍNUA<br/>Seurat → RGraphSpace → PathwaySpace<br/>distâncias · silhueta · projeção circular"]:::process
+    FIG2["FIGURAS<br/>QC · clusters · DEG/SVG<br/>spots × sinal contínuo"]:::figure
+    VIG2["VINHETA COMPLETA<br/>duas seções · SCTransform<br/>PCA · UMAP/t-SNE · clusters"]:::process
+    BRAIN["OBJETO PERSISTENTE<br/>data/brain.RDS<br/>Seurat normalizado, reduzido e clusterizado"]:::generated
+    STX --> PREP
+    PREP --> DIM --> GENES --> SPACE --> FIG2
+    STX --> VIG2
+    VIG2 --> BRAIN
+  end
+
+  subgraph A3["AULA 3 · 3 h"]
+    direction TB
+
+    subgraph RCTD_LANE["Deconvolução espacial"]
+      direction LR
+      RAW["DADO UTILIZADO<br/>stxBrain anterior1<br/>contagens brutas + coordenadas"]:::used
+      ALLEN["REFERÊNCIA<br/>data/allen_cortex.rds<br/>scRNA-seq anotado e filtrado"]:::used
+      RCTD_RUN["RCTD · spacexr<br/>referência + SpatialRNA<br/>deconvolução em modo doublet"]:::process
+      RCTD_OUT["RESULTADOS REUTILIZADOS<br/>RDS do ajuste · resumo CSV<br/>Seurat anotado com tipos celulares"]:::generated
+      RCTD_FIG["FIGURAS<br/>classes de spots<br/>primeiro e segundo tipo celular"]:::figure
+      RAW --> RCTD_RUN
+      ALLEN --> RCTD_RUN
+      RCTD_RUN --> RCTD_OUT --> RCTD_FIG
+    end
+
+    subgraph COMM_LANE["Comunicação celular espacial"]
+      direction LR
+      BRAIN3["DADO REUTILIZADO<br/>data/brain.RDS · Aula 2<br/>clusters · expressão · coordenadas<br/>tipos RCTD como opção no desafio"]:::used
+      COMM_RUN["CellChat<br/>clusters + expressão normalizada<br/>distância/contato ≤ 100 µm"]:::process
+      COMM_OUT["OBJETO GERADO<br/>resultados/spot-spot_commu_<br/>anterior.rds"]:::generated
+      COMM_PROJ["PROJEÇÃO ESPACIAL<br/>pares direcionados de spots<br/>GraphSpace + PathwaySpace"]:::process
+      COMM_FIG["FIGURAS<br/>interações ligante–receptor<br/>incluindo Fgf1–Fgfr1/2/3"]:::figure
+      BRAIN3 --> COMM_RUN --> COMM_OUT --> COMM_PROJ --> COMM_FIG
+    end
+
+    subgraph HD_LANE["Visium HD e geometria celular"]
+      direction LR
+      HD_IN["DADO PREPARADO<br/>data/VisiumHD_GS_Crop.RDS<br/>GraphSpace · recorte com 539 células"]:::used
+      HD_GEOM["GEOMETRIA CELULAR<br/>limites já segmentados<br/>centros × polígonos · expressão de PIGR"]:::process
+      HD_PROJ["PROJEÇÃO CONTÍNUA<br/>PathwaySpace · silhueta<br/>sinal de PIGR sobre a geometria"]:::process
+      HD_FIG["FIGURAS<br/>segmentação celular<br/>polígonos × projeção contínua"]:::figure
+      HD_IN --> HD_GEOM --> HD_PROJ --> HD_FIG
+    end
+
+    DOWNSTREAM["SÍNTESE E PERSPECTIVAS<br/>anotação · SVGs · microambientes · ecossistemas<br/>integração 3D/4D · comparação de plataformas · limitações"]:::concept
+    RCTD_LANE ~~~ COMM_LANE
+    COMM_LANE ~~~ HD_LANE
+    RCTD_LANE --> DOWNSTREAM
+    COMM_LANE --> DOWNSTREAM
+    HD_LANE --> DOWNSTREAM
+  end
+
+  SUP --> A1
+  A1 --> A2
+  A2 --> A3

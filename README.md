@@ -44,7 +44,7 @@ O curso tem caráter teórico-prático. As exposições conceituais são seguida
 
 <p align="center">
 
-<img src="imagens/estrutura_conceitual_curso_transcriptomica_espacial.png" alt="Estrutura conceitual do curso, com aulas, vinhetas, dados utilizados e resultados gerados"/>
+<img src="imagens/Fluxograma/estrutura_conceitual_curso_transcriptomica_espacial.png" alt="Estrutura conceitual atualizada do curso, com o fluxo de dados e análises das três aulas"/>
 
 </p>
 
