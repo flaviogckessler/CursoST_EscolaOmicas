@@ -364,6 +364,7 @@ Este bloco aparece para documentar a reprodução, mas não é executado na comp
 
 ```{r}
 #| label: rctd-carregar-resumo
+#| results: hide
 
 arquivo_resumo_rctd <- arquivo_obrigatorio(
   diretorio_resultados,
@@ -386,16 +387,17 @@ tab_classe_rctd <- tab_classe_rctd[
   order(tab_classe_rctd$spots, decreasing = TRUE),
 ]
 
-knitr::kable(tab_classe_rctd, row.names = FALSE)
 ```
 
 ## Composição das classes
 
 ```{r}
 #| label: rctd-grafico-classes
+#| echo: false
 #| fig-width: 9
-#| fig-height: 4.8
-#| out-width: "90%"
+#| fig-height: 5.5
+#| out-width: "82%"
+#| fig-align: center
 
 ggplot(
   tab_classe_rctd,
@@ -419,6 +421,7 @@ Dos 2.696 spots, 2.483 receberam a classe doublet_certain.
 
 ```{r}
 #| label: rctd-tabela-resultados
+#| echo: false
 
 colunas_rctd <- c(
   "spot_class",
@@ -439,9 +442,11 @@ knitr::kable(
 
 ```{r}
 #| label: rctd-mapa-executado
+#| echo: false
 #| fig-width: 12
 #| fig-height: 5
-#| out-width: "100%"
+#| out-width: "92%"
+#| fig-align: center
 
 suppressPackageStartupMessages({
   library("Seurat")
@@ -680,6 +685,8 @@ saveRDS(
 
 ```{r}
 #| label: cellchat-carregar-resultados
+#| results: hide
+#| cache: false
 
 suppressPackageStartupMessages({
   library("dplyr")
@@ -711,13 +718,40 @@ resumo_cellchat <- data.frame(
   )
 )
 
-knitr::kable(resumo_cellchat, row.names = FALSE)
 ```
+
+## Escala do resultado CellChat
+
+::: {.columns .metric-row}
+::: {.column width="24%"}
+<span class="result-number">`r format(nrow(comunicacoes), big.mark = ".", decimal.mark = ",", scientific = FALSE)`</span>
+
+<span class="result-label">registros ligante-receptor projetados</span>
+:::
+::: {.column width="24%"}
+<span class="result-number">`r format(dplyr::n_distinct(paste(comunicacoes$source_spot, comunicacoes$target_spot, sep = "::")), big.mark = ".", decimal.mark = ",", scientific = FALSE)`</span>
+
+<span class="result-label">pares direcionados de spots</span>
+:::
+::: {.column width="24%"}
+<span class="result-number">`r dplyr::n_distinct(comunicacoes$interaction_name)`</span>
+
+<span class="result-label">interações ligante-receptor</span>
+:::
+::: {.column width="24%"}
+<span class="result-number">`r dplyr::n_distinct(comunicacoes$pathway_name)`</span>
+
+<span class="result-label">vias de sinalização</span>
+:::
+:::
+
+<div class="source-note">As linhas resultam da projeção das comunicações inferidas entre clusters sobre pares de spots vizinhos.</div>
 
 ## Interações mais frequentes
 
 ```{r}
 #| label: cellchat-top-interacoes
+#| results: hide
 
 top_interacoes <- comunicacoes |>
   mutate(
@@ -732,20 +766,40 @@ top_interacoes <- comunicacoes |>
   arrange(desc(pares_de_spots), desc(probabilidade_media)) |>
   slice_head(n = 10)
 
-knitr::kable(
-  top_interacoes,
-  row.names = FALSE,
-  digits = 4
-)
 ```
+
+## Interações dominantes no tecido
+
+```{r}
+#| label: cellchat-tabela-top
+#| echo: false
+
+top_interacoes |>
+  slice_head(n = 8) |>
+  knitr::kable(
+    row.names = FALSE,
+    digits = 4,
+    col.names = c(
+      "Ligante - receptor",
+      "Via",
+      "Pares de spots",
+      "Probabilidade m&eacute;dia"
+    ),
+    escape = FALSE
+  )
+```
+
+<div class="source-note">A contagem informa em quantos pares de spots cada interação aparece após a projeção espacial.</div>
 
 ## Frequência nos pares de spots
 
 ```{r}
 #| label: cellchat-grafico-top
-#| fig-width: 9
-#| fig-height: 5.6
-#| out-width: "92%"
+#| echo: false
+#| fig-width: 10.5
+#| fig-height: 6.2
+#| out-width: "86%"
+#| fig-align: center
 
 ggplot(
   top_interacoes,
@@ -765,6 +819,8 @@ ggplot(
   ) +
   theme(panel.grid.major.y = element_blank())
 ```
+
+<div class="source-note">O gráfico resume a frequência espacial das dez interações mais representadas no resultado reutilizável.</div>
 
 ## Rede espacial no GraphSpace
 
@@ -851,23 +907,31 @@ pspace_obj <- circularProjection(
 )
 ```
 
-## Fgf1 e Fgfr1
+## PathwaySpace: Fgf1-Fgfr1 {.result-slide}
 
-![Projeção espacial da comunicação Fgf1-Fgfr1.](assets/cellchat-fgf1-fgfr1.png){height="78%" fig-align="center"}
+![](assets/cellchat-fgf1-fgfr1.png){.cellchat-map fig-align="center"}
 
-## Três receptores de Fgf1
+<div class="source-note">A projeção concentra o sinal em domínios laterais do tecido e em focos localizados na região central.</div>
 
-::: {.columns}
-::: {.column width="33%"}
-![Fgf1-Fgfr1](assets/cellchat-fgf1-fgfr1.png){width="100%"}
-:::
-::: {.column width="33%"}
-![Fgf1-Fgfr2](assets/cellchat-fgf1-fgfr2.png){width="100%"}
-:::
-::: {.column width="33%"}
-![Fgf1-Fgfr3](assets/cellchat-fgf1-fgfr3.png){width="100%"}
-:::
-:::
+## PathwaySpace: Fgf1-Fgfr2 {.result-slide}
+
+![](assets/cellchat-fgf1-fgfr2.png){.cellchat-map fig-align="center"}
+
+<div class="source-note">Fgfr2 produz uma cobertura mais contínua, com sinal amplo nos dois domínios laterais e na porção superior.</div>
+
+## PathwaySpace: Fgf1-Fgfr3 {.result-slide}
+
+![](assets/cellchat-fgf1-fgfr3.png){.cellchat-map fig-align="center"}
+
+<div class="source-note">Fgfr3 apresenta focos mais fragmentados e distribuídos pela periferia e pela porção inferior do tecido.</div>
+
+## Comparação entre receptores de Fgf1
+
+- O ligante é o mesmo, mas a distribuição espacial muda com o receptor.
+- Fgfr1 e Fgfr2 formam domínios projetados mais extensos.
+- Fgfr3 produz uma paisagem mais descontínua, com focos separados.
+
+> A projeção descreve onde a interação é compatível com a rede espacial e com a expressão observada. Ela não demonstra fluxo molecular direto entre células.
 
 ## Desafio
 
@@ -913,6 +977,7 @@ invisible(gc())
 ```{r}
 #| label: segmentacao-carregar
 #| cache: false
+#| echo: false
 
 suppressPackageStartupMessages({
   library("RGraphSpace")
@@ -942,6 +1007,7 @@ data.frame(
 ```{r}
 #| label: segmentacao-geometrias
 #| cache: false
+#| echo: false
 
 geometrias_celulares <- gs_crop@nodes$cellseg
 
@@ -951,6 +1017,11 @@ tipos_geometria <- as.data.frame(
 )
 
 names(tipos_geometria) <- c("geometria", "celulas")
+tipos_geometria <- tipos_geometria[
+  tipos_geometria$celulas > 0,
+  ,
+  drop = FALSE
+]
 
 knitr::kable(
   tipos_geometria,
@@ -965,14 +1036,26 @@ O objeto contém 539 células, com geometrias POLYGON e MULTIPOLYGON alinhadas a
 ```{r}
 #| label: segmentacao-celulas-individuais
 #| cache: false
-#| fig-show: hold
-#| out-width: "30%"
-#| fig-width: 4
-#| fig-height: 4
+#| echo: false
+#| out-width: "94%"
+#| fig-width: 12
+#| fig-height: 4.2
+#| fig-align: center
 
-plot(geometrias_celulares[1], main = "Celula 1")
-plot(geometrias_celulares[2], main = "Celula 2")
-plot(geometrias_celulares[3], main = "Celula 3")
+parametros_graficos <- par(
+  mfrow = c(1, 3),
+  mar = c(1.5, 1.5, 2.5, 1.5)
+)
+
+for (i in 1:3) {
+  plot(
+    geometrias_celulares[i],
+    main = paste("Celula", i),
+    axes = FALSE
+  )
+}
+
+par(parametros_graficos)
 ```
 
 ## Primeiras vinte geometrias
@@ -980,9 +1063,11 @@ plot(geometrias_celulares[3], main = "Celula 3")
 ```{r}
 #| label: segmentacao-combinar
 #| cache: false
+#| echo: false
 #| fig-width: 6
 #| fig-height: 5.5
-#| out-width: "62%"
+#| out-width: "72%"
+#| fig-align: center
 
 plot(
   sf::st_combine(geometrias_celulares[1:20]),
@@ -995,9 +1080,11 @@ plot(
 ```{r}
 #| label: segmentacao-limites
 #| cache: false
+#| echo: false
 #| fig-width: 7.5
 #| fig-height: 5.6
-#| out-width: "76%"
+#| out-width: "72%"
+#| fig-align: center
 
 p_limites <- ggplot(gs_crop) +
   annotation_gspace_image(gs_crop, opacity = 1) +
@@ -1027,9 +1114,11 @@ p_limites
 ```{r}
 #| label: segmentacao-vertices
 #| cache: false
+#| echo: false
 #| fig-width: 7
 #| fig-height: 5.4
-#| out-width: "74%"
+#| out-width: "70%"
+#| fig-align: center
 
 cpal_segmentacao <- hcl.colors(
   100,
@@ -1068,9 +1157,11 @@ p_vertices
 ```{r}
 #| label: segmentacao-poligonos
 #| cache: false
+#| echo: false
 #| fig-width: 7
 #| fig-height: 5.4
-#| out-width: "74%"
+#| out-width: "70%"
+#| fig-align: center
 
 p_poligonos <- ggplot(gs_crop) +
   annotation_gspace_image(gs_crop, opacity = 1) +
@@ -1105,9 +1196,11 @@ p_poligonos
 ```{r}
 #| label: segmentacao-comparacao
 #| cache: false
+#| echo: false
 #| fig-width: 12
 #| fig-height: 5.5
-#| out-width: "100%"
+#| out-width: "94%"
+#| fig-align: center
 
 p_vertices + p_poligonos +
   patchwork::plot_annotation(
@@ -1120,6 +1213,7 @@ p_vertices + p_poligonos +
 ```{r}
 #| label: segmentacao-pathwayspace
 #| cache: false
+#| results: hide
 
 pspace_visiumhd <- buildPathwaySpace(
   gs_crop,
@@ -1144,9 +1238,11 @@ pdist_visiumhd
 ```{r}
 #| label: segmentacao-silhueta
 #| cache: false
+#| echo: false
 #| fig-width: 7.4
 #| fig-height: 5.4
-#| out-width: "75%"
+#| out-width: "70%"
+#| fig-align: center
 
 ggplot(pspace_visiumhd) +
   annotation_gspace_image(pspace_visiumhd) +
@@ -1185,9 +1281,11 @@ pspace_visiumhd <- circularProjection(
 ```{r}
 #| label: segmentacao-painel-final
 #| cache: false
+#| echo: false
 #| fig-width: 12
 #| fig-height: 5.5
-#| out-width: "100%"
+#| out-width: "94%"
+#| fig-align: center
 
 p_projecao <- ggplot(pspace_visiumhd) +
   annotation_gspace_image(pspace_visiumhd) +
@@ -1254,9 +1352,12 @@ Os dois métodos dependem de uma referência anotada e de compatibilidade entre 
 
 ## Microambientes teciduais
 
-![Compartimentos maligno, de borda e não maligno em diferentes tecidos. Fonte: Xun et al. (2023).](assets/downstream-microambientes.png){height="72%" fig-align="center"}
+![Compartimentos maligno, de borda e não maligno em diferentes tecidos. Fonte: Xun et al. (2023).](assets/downstream-microambientes.png){height="64%" fig-align="center"}
 
-NCEM modela comunicação em grafos celulares [@Fischer2023NCEM]. Cottrazm reconstrói o microambiente tumoral ao longo do eixo maligno, borda e não maligno [@Xun2023TumorMicroenvironment].
+## Modelos de microambientes
+
+- NCEM modela comunicação em grafos celulares [@Fischer2023NCEM].
+- Cottrazm reconstrói o microambiente tumoral ao longo do eixo maligno, borda e não maligno [@Xun2023TumorMicroenvironment].
 
 ## Ecossistemas integrados
 

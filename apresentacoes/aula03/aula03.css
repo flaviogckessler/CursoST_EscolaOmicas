@@ -113,6 +113,11 @@
   margin-top: 0.25em;
 }
 
+.reveal .cell-output-display img {
+  max-height: 64vh;
+  object-fit: contain;
+}
+
 .reveal figure {
   margin: 0.25em auto;
 }
@@ -127,6 +132,10 @@
 
 .reveal img {
   object-fit: contain;
+}
+
+.reveal figure > img {
+  max-height: 66vh;
 }
 
 .reveal .compact {
@@ -151,6 +160,35 @@
   font-size: 1.8em;
   font-weight: 700;
   line-height: 1;
+}
+
+.reveal .metric-row {
+  align-items: flex-start;
+  margin-top: 1.6em;
+  text-align: center;
+}
+
+.reveal .result-label {
+  color: var(--st-ink);
+  display: block;
+  font-size: 0.72em;
+  line-height: 1.2;
+  margin: 0.45em auto 0;
+  max-width: 10em;
+}
+
+.reveal img.cellchat-map {
+  display: block;
+  height: auto;
+  margin: 0.1em auto 0.15em;
+  max-height: 68vh;
+  max-width: 68%;
+  width: auto;
+}
+
+.reveal .result-slide .source-note {
+  margin-top: 0.15em;
+  text-align: center;
 }
 
 .reveal blockquote {
@@ -189,6 +227,6 @@
 
 @media print {
   .reveal pre {
-    max-height: none;
+    max-height: 63vh;
   }
 }
