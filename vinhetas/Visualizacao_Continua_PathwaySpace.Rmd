@@ -15,7 +15,7 @@ output:
     number_sections: true
     code_folding: show
 params:
-  run_analysis: false
+  run_analysis: true
 ---
 
 ```{r configuracao, include=FALSE, purl=FALSE}
@@ -48,7 +48,7 @@ Nesta vinheta, visualizaremos a expressão do gene `Camk2n1` na região anterior
 
 O objeto de entrada é `data/brain.RDS`, produzido na etapa anterior do curso. O fluxo segue a ordem: inspeção do objeto, seleção da região anterior, escolha do gene, construção do espaço gráfico, projeção do sinal e comparação das visualizações.
 
-A versão HTML, quando for produzida, apresentará o roteiro sem executar a análise. Durante o curso, abra este arquivo `.Rmd` no RStudio e execute os blocos na ordem em que aparecem.
+A versão HTML apresenta o código e os resultados produzidos pela execução da análise. Durante o curso, você também pode abrir este arquivo `.Rmd` no RStudio e executar os blocos na ordem em que aparecem.
 
 Essa vinheta segue o fluxo de trabalho apresentado na vinheta do pacote: [Visualizing spatial transcriptomics](https://sysbiolab.github.io/PathwaySpace/articles/spatial-transcriptomics.html).
 

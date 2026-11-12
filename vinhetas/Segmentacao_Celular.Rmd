@@ -14,7 +14,7 @@ output:
     number_sections: true
     code_folding: show
 params:
-  run_analysis: false
+  run_analysis: true
 ---
 
 ```{r configuracao, include=FALSE, purl=FALSE}
@@ -236,7 +236,7 @@ O objeto `data/Xenium_GS_Crop.RDS` permanece disponível para novas exploraçõe
 
 # Informações da sessão
 
-```{r informacoes-sessao, echo=FALSE}
+```{r informacoes-sessao, echo=TRUE}
 sessionInfo()
 ```
 
