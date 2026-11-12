@@ -17,17 +17,9 @@ params:
 ---
 
 ```{r configuracao, include=FALSE, purl=FALSE}
-executar_analise <- if (exists("params", inherits = FALSE)) {
-  isTRUE(params$run_analysis)
-} else {
-  # Ao executar os blocos manualmente, o objeto params não é criado.
-  # Nesse caso, a análise fica habilitada por padrão.
-  TRUE
-}
-
 knitr::opts_chunk$set(
   echo = TRUE,
-  eval = executar_analise,
+  eval = TRUE,
   collapse = TRUE,
   comment = "#>",
   fig.align = "center",
@@ -35,7 +27,7 @@ knitr::opts_chunk$set(
   fig.height = 6,
   dev = "png",
   dpi = 120,
-  message = TRUE,
+  message = FALSE,
   warning = FALSE
 )
 ```

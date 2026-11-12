@@ -1,0 +1,194 @@
+:root {
+  --st-ink: #17313a;
+  --st-deep: #0b3b49;
+  --st-teal: #148f77;
+  --st-green: #58a55c;
+  --st-soft: #eef6f3;
+  --st-line: #c8d9d4;
+}
+
+.reveal {
+  color: var(--st-ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 30px;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3 {
+  color: var(--st-deep);
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-transform: none;
+}
+
+.reveal h1 {
+  font-size: 1.65em;
+}
+
+.reveal h2 {
+  border-bottom: 4px solid var(--st-teal);
+  font-size: 1.25em;
+  padding-bottom: 0.14em;
+}
+
+.reveal h3 {
+  font-size: 0.95em;
+}
+
+.reveal .title-slide h1 {
+  color: var(--st-deep);
+  font-size: 1.8em;
+  line-height: 1.08;
+}
+
+.reveal .title-slide .subtitle {
+  color: var(--st-teal);
+  font-size: 0.95em;
+}
+
+.reveal .title-slide .author,
+.reveal .title-slide .institute {
+  color: var(--st-ink);
+  font-size: 0.62em;
+}
+
+.reveal p,
+.reveal li {
+  line-height: 1.28;
+}
+
+.reveal strong {
+  color: var(--st-deep);
+}
+
+.reveal a {
+  color: var(--st-teal);
+}
+
+.reveal table {
+  border-collapse: collapse;
+  font-size: 0.67em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reveal table th {
+  background: var(--st-deep);
+  color: white;
+  font-weight: 700;
+}
+
+.reveal table th,
+.reveal table td {
+  border: 1px solid var(--st-line);
+  padding: 0.32em 0.5em;
+  vertical-align: top;
+}
+
+.reveal table tr:nth-child(even) td {
+  background: var(--st-soft);
+}
+
+.reveal pre {
+  border: 1px solid var(--st-line);
+  border-left: 6px solid var(--st-teal);
+  box-shadow: none;
+  font-size: 0.53em;
+  line-height: 1.18;
+  max-height: 63vh;
+  width: 100%;
+}
+
+.reveal code {
+  font-family: Consolas, "Liberation Mono", monospace;
+}
+
+.reveal .cell-output {
+  font-size: 0.78em;
+}
+
+.reveal .cell-output-display {
+  margin-top: 0.25em;
+}
+
+.reveal figure {
+  margin: 0.25em auto;
+}
+
+.reveal figcaption,
+.reveal .caption,
+.reveal .source-note {
+  color: #52666c;
+  font-size: 0.47em;
+  line-height: 1.18;
+}
+
+.reveal img {
+  object-fit: contain;
+}
+
+.reveal .compact {
+  font-size: 0.78em;
+}
+
+.reveal .small {
+  font-size: 0.65em;
+}
+
+.reveal .tiny {
+  font-size: 0.52em;
+}
+
+.reveal .highlight {
+  color: var(--st-teal);
+  font-weight: 700;
+}
+
+.reveal .result-number {
+  color: var(--st-teal);
+  font-size: 1.8em;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.reveal blockquote {
+  background: var(--st-soft);
+  border-left: 8px solid var(--st-green);
+  color: var(--st-ink);
+  font-size: 0.82em;
+  padding: 0.45em 0.8em;
+  width: 90%;
+}
+
+.reveal .callout {
+  font-size: 0.78em;
+}
+
+.reveal .slide-number {
+  color: var(--st-deep);
+  font-size: 0.45em;
+}
+
+.reveal section[data-background-color="#0B3B49"] h1,
+.reveal section[data-background-color="#0B3B49"] h2,
+.reveal section[data-background-color="#0B3B49"] p {
+  color: white;
+}
+
+.reveal .columns {
+  align-items: center;
+  gap: 1.2em;
+}
+
+.reveal .footer {
+  color: #60767d;
+  font-size: 0.4em;
+}
+
+@media print {
+  .reveal pre {
+    max-height: none;
+  }
+}
