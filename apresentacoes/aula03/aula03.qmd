@@ -1,6 +1,6 @@
 ---
 title: "Análise de Dados de Transcriptômica Espacial"
-subtitle: "Deconvolução, comunicação celular, segmentação e análises downstream"
+subtitle: "Análises Downstream: deconvolução, comunicação celular e segmentação celular"
 author: "Flávio Gabriel Carazza-Kessler"
 institute: "SysbioLab | UFPR"
 lang: pt-BR
@@ -93,55 +93,59 @@ theme_set(
 
 ## Roteiro da aula
 
-1. Deconvolução de spots Visium com RCTD
-2. Comunicação célula-célula com CellChat e PathwaySpace
-3. Segmentação celular em Visium HD
-4. Referências e possibilidades de análise downstream
+1.  Deconvolução de spots Visium com RCTD
+2.  Comunicação célula-célula com CellChat e PathwaySpace
+3.  Segmentação celular em Visium HD
+4.  Referências e possibilidades de análise
 
-## Estratégia de compilação
+## Roteiro da aula
 
-| Bloco | O que a apresentação executa | O que permanece como demonstração |
-|---|---|---|
-| RCTD | leitura dos resultados, sumários e mapas | preparação da referência e ajuste completo |
-| CellChat | leitura das comunicações, tabelas e gráficos | inferência ligante-receptor no objeto de 1 GB |
-| Visium HD | inspeção, geometrias, gráficos e projeção | somente o salvamento externo das figuras |
+| Bloco | Etapas |
+|------------------------------------|------------------------------------|
+| RCTD | carregar 'stxBrain', preparar referência single-cell, construir objeto lido pelo RCTD, executar deconvolução, anotar spots no dado espacial |
+| CellChat | carregar 'stxBrain', preparar objeto CellChat, definir banco de dados de ligantes-receptores, inferir comunicação célula-célula, imputar dados à nível de spot, visualizar com pacote PathwaySpace |
+| Segmentação celular | carregar objeto preparado, inspecionar geometrias, representação das células como polígonos, visualização |
 
-> A apresentação usa resultados pré-processados quando a execução completa seria incompatível com uma aula ou com um build previsível.
+> A apresentação usa resultados pré-processados quando a execução completa seria incompatível com o tempo disposto em aula.
 
 ## Encadeamento analítico
 
-::: {.columns}
+:::::: columns
 ::: {.column width="31%"}
 **Composição**
 
 Quais tipos celulares contribuem para cada spot?
 
-RCTD
+*RCTD*
 :::
+
 ::: {.column width="31%"}
 **Comunicação**
 
 Quais pares ligante-receptor conectam regiões vizinhas?
 
-CellChat + PathwaySpace
+*CellChat + PathwaySpace*
 :::
+
 ::: {.column width="31%"}
-**Forma celular**
+**Segmentação celular**
 
 Como limites celulares mudam a representação espacial?
 
-Visium HD + geometrias sf
+*Visium HD + geometrias sf*
 :::
-:::
+::::::
 
 # Deconvolução com RCTD {background-color="#0B3B49"}
 
-## Por que deconvoluir spots
+## Por que *deconvoluir* spots
 
-- Um spot Visium contém RNA de várias células.
-- A expressão observada mistura perfis de tipos celulares diferentes.
-- Uma referência single-cell anotada fornece os perfis de expressão esperados.
-- O RCTD estima a contribuição dos tipos celulares para cada spot [@Cable2022RCTD].
+-   Um spot Visium pode conter RNA de várias células.
+-   A expressão observada mistura perfis de tipos celulares diferentes.
+-   Uma referência single-cell anotada fornece os perfis de expressão esperados.
+-   O RCTD estima a contribuição dos tipos celulares para cada spot [@Cable2022RCTD].
+
+> Em anotação/deconvolução de tipos celulares com uso de uma REFERÊNCIA será sempre "enviesada" por ela. Referência boa, anotação boa.
 
 ## Modelo conceitual do RCTD
 
@@ -150,35 +154,42 @@ Visium HD + geometrias sf
 ## Entradas e saída
 
 | Componente | Objeto | Informação usada |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | amostra espacial | stxBrain anterior1 | contagens brutas e coordenadas |
-| referência | córtex de camundongo do Allen Institute | contagens brutas e tipo celular |
+| referência | córtex de camundongo do Allen Institute [@Tasic2016AdultMouseCortical] | contagens brutas e tipo celular |
 | resultado | objeto RCTD | classe do spot, tipos e pesos |
 
 As duas matrizes precisam usar identificadores gênicos compatíveis e contagens inteiras.
 
+::: fragment
+![stxBrain anterior1](assets/stxbrain.png){width="25%" fig-align="left"}
+:::
+
+::: fragment
+![Referência single-cell: córtex de camumdongo. ](assets/Allen.png){width="60%" fig-align="right"}
+:::
+
 ## Modos de ajuste
 
-::: {.fragment}
+::: fragment
 **doublet**: atribui no máximo dois tipos celulares por spot.
 :::
 
-::: {.fragment}
+::: fragment
 **multi**: permite até o limite configurado em MAX_MULTI_TYPES.
 :::
 
-::: {.fragment}
+::: fragment
 **full**: não impõe um número fixo de tipos.
 :::
 
-O curso usa o modo doublet para manter o custo computacional controlado. A restrição descreve o modelo, não a quantidade real de células no spot.
+O curso usa o modo *doublet* para manter o custo computacional controlado. A restrição descreve o modelo, não a quantidade real de células no spot.
 
 ## Custo computacional
 
-- A referência do Allen Institute ocupa cerca de 1 GB em disco e aproximadamente 3 GB em memória.
-- A execução validada do RCTD levou 14,22 minutos em um servidor com 30 núcleos.
-- No Windows, o fluxo original usa um núcleo.
-- O build desta aula não recalcula o modelo.
+-   A referência do Allen Institute ocupa cerca de 1 GB em disco e aproximadamente 3 GB em memória.
+-   A execução validada do RCTD levou 14,22 minutos em um servidor com 30 núcleos e 160Gb de RAM.
+-   No Windows, o fluxo original permite utilizar apenas um núcleo.
 
 ## Conferir o ambiente
 
@@ -199,6 +210,29 @@ if (length(ausentes) > 0) {
   stop("Pacotes ausentes: ", paste(ausentes, collapse = ", "))
 }
 ```
+
+::: fragment
+```{r}
+#| label: rctd-pacotes-demonstracao2
+#| eval: false
+
+diretorio_vinhetas <- getwd()
+
+diretorio_curso <- dirname(diretorio_vinhetas)
+diretorio_dados <- file.path(diretorio_curso, "data")
+diretorio_imagens <- file.path(diretorio_curso, "imagens")
+diretorio_resultados <- file.path(diretorio_curso, "resultados")
+
+dir.create(diretorio_dados, showWarnings = FALSE, recursive = TRUE)
+dir.create(diretorio_imagens, showWarnings = FALSE, recursive = TRUE)
+dir.create(diretorio_resultados, showWarnings = FALSE, recursive = TRUE)
+
+diretorio_curso
+diretorio_dados
+diretorio_imagens
+diretorio_resultados
+```
+:::
 
 ## Carregar a amostra espacial
 
@@ -477,14 +511,15 @@ p_classe + p_tipo
 
 ## Primeiro e segundo tipo celular
 
-::: {.columns}
+::::: columns
 ::: {.column width="50%"}
 ![Primeiro tipo celular atribuído em cada spot.](assets/rctd-primeiro-tipo.png){width="100%"}
 :::
+
 ::: {.column width="50%"}
 ![Segundo tipo celular atribuído em cada spot.](assets/rctd-segundo-tipo.png){width="100%"}
 :::
-:::
+:::::
 
 ## Composição celular no tecido
 
@@ -492,11 +527,11 @@ p_classe + p_tipo
 
 ## Interpretação do modo doublet
 
-- singlet: um tipo celular confiável.
-- doublet_certain: dois tipos celulares confiáveis.
-- doublet_uncertain: somente o primeiro tipo é confiável.
-- reject: nenhuma atribuição confiável.
-- Os pesos descrevem a composição estimada e dependem da referência usada.
+-   singlet: um tipo celular confiável.
+-   doublet_certain: dois tipos celulares confiáveis.
+-   doublet_uncertain: somente o primeiro tipo é confiável.
+-   reject: nenhuma atribuição confiável.
+-   Os pesos descrevem a composição estimada e dependem da referência usada.
 
 ```{r}
 #| label: rctd-liberar-memoria
@@ -516,11 +551,11 @@ No espacial, a expressão não basta. A distância entre as populações também
 
 ## Do cluster ao tecido
 
-1. Inferir comunicações entre clusters.
-2. Localizar os spots de origem e destino.
-3. Restringir a comunicação a spots espacialmente próximos.
-4. Associar a comunicação às arestas da rede.
-5. Projetar o sinal com PathwaySpace.
+1.  Inferir comunicações entre clusters.
+2.  Localizar os spots de origem e destino.
+3.  Restringir a comunicação a spots espacialmente próximos.
+4.  Associar a comunicação às arestas da rede.
+5.  Projetar o sinal com PathwaySpace.
 
 ## Entradas do CellChat
 
@@ -722,30 +757,35 @@ resumo_cellchat <- data.frame(
 
 ## Escala do resultado CellChat
 
-::: {.columns .metric-row}
+::::::: {.columns .metric-row}
 ::: {.column width="24%"}
-<span class="result-number">`r format(nrow(comunicacoes), big.mark = ".", decimal.mark = ",", scientific = FALSE)`</span>
+[`r format(nrow(comunicacoes), big.mark = ".", decimal.mark = ",", scientific = FALSE)`]{.result-number}
 
-<span class="result-label">registros ligante-receptor projetados</span>
+[registros ligante-receptor projetados]{.result-label}
 :::
+
 ::: {.column width="24%"}
-<span class="result-number">`r format(dplyr::n_distinct(paste(comunicacoes$source_spot, comunicacoes$target_spot, sep = "::")), big.mark = ".", decimal.mark = ",", scientific = FALSE)`</span>
+[`r format(dplyr::n_distinct(paste(comunicacoes$source_spot, comunicacoes$target_spot, sep = "::")), big.mark = ".", decimal.mark = ",", scientific = FALSE)`]{.result-number}
 
-<span class="result-label">pares direcionados de spots</span>
+[pares direcionados de spots]{.result-label}
 :::
+
 ::: {.column width="24%"}
-<span class="result-number">`r dplyr::n_distinct(comunicacoes$interaction_name)`</span>
+[`r dplyr::n_distinct(comunicacoes$interaction_name)`]{.result-number}
 
-<span class="result-label">interações ligante-receptor</span>
+[interações ligante-receptor]{.result-label}
 :::
+
 ::: {.column width="24%"}
-<span class="result-number">`r dplyr::n_distinct(comunicacoes$pathway_name)`</span>
+[`r dplyr::n_distinct(comunicacoes$pathway_name)`]{.result-number}
 
-<span class="result-label">vias de sinalização</span>
+[vias de sinalização]{.result-label}
 :::
-:::
+:::::::
 
-<div class="source-note">As linhas resultam da projeção das comunicações inferidas entre clusters sobre pares de spots vizinhos.</div>
+::: source-note
+As linhas resultam da projeção das comunicações inferidas entre clusters sobre pares de spots vizinhos.
+:::
 
 ## Interações mais frequentes
 
@@ -789,7 +829,9 @@ top_interacoes |>
   )
 ```
 
-<div class="source-note">A contagem informa em quantos pares de spots cada interação aparece após a projeção espacial.</div>
+::: source-note
+A contagem informa em quantos pares de spots cada interação aparece após a projeção espacial.
+:::
 
 ## Frequência nos pares de spots
 
@@ -820,7 +862,9 @@ ggplot(
   theme(panel.grid.major.y = element_blank())
 ```
 
-<div class="source-note">O gráfico resume a frequência espacial das dez interações mais representadas no resultado reutilizável.</div>
+::: source-note
+O gráfico resume a frequência espacial das dez interações mais representadas no resultado reutilizável.
+:::
 
 ## Rede espacial no GraphSpace
 
@@ -911,25 +955,31 @@ pspace_obj <- circularProjection(
 
 ![](assets/cellchat-fgf1-fgfr1.png){.cellchat-map fig-align="center"}
 
-<div class="source-note">A projeção concentra o sinal em domínios laterais do tecido e em focos localizados na região central.</div>
+::: source-note
+A projeção concentra o sinal em domínios laterais do tecido e em focos localizados na região central.
+:::
 
 ## PathwaySpace: Fgf1-Fgfr2 {.result-slide}
 
 ![](assets/cellchat-fgf1-fgfr2.png){.cellchat-map fig-align="center"}
 
-<div class="source-note">Fgfr2 produz uma cobertura mais contínua, com sinal amplo nos dois domínios laterais e na porção superior.</div>
+::: source-note
+Fgfr2 produz uma cobertura mais contínua, com sinal amplo nos dois domínios laterais e na porção superior.
+:::
 
 ## PathwaySpace: Fgf1-Fgfr3 {.result-slide}
 
 ![](assets/cellchat-fgf1-fgfr3.png){.cellchat-map fig-align="center"}
 
-<div class="source-note">Fgfr3 apresenta focos mais fragmentados e distribuídos pela periferia e pela porção inferior do tecido.</div>
+::: source-note
+Fgfr3 apresenta focos mais fragmentados e distribuídos pela periferia e pela porção inferior do tecido.
+:::
 
 ## Comparação entre receptores de Fgf1
 
-- O ligante é o mesmo, mas a distribuição espacial muda com o receptor.
-- Fgfr1 e Fgfr2 formam domínios projetados mais extensos.
-- Fgfr3 produz uma paisagem mais descontínua, com focos separados.
+-   O ligante é o mesmo, mas a distribuição espacial muda com o receptor.
+-   Fgfr1 e Fgfr2 formam domínios projetados mais extensos.
+-   Fgfr3 produz uma paisagem mais descontínua, com focos separados.
 
 > A projeção descreve onde a interação é compatível com a rede espacial e com a expressão observada. Ela não demonstra fluxo molecular direto entre células.
 
@@ -967,10 +1017,10 @@ invisible(gc())
 
 ## O que esta prática faz
 
-- Usa limites celulares já estimados pelo processamento do Visium HD.
-- Não executa um novo algoritmo de segmentação.
-- Representa cada célula como centro e como polígono.
-- Projeta a expressão de PIGR no espaço contínuo.
+-   Usa limites celulares já estimados pelo processamento do Visium HD.
+-   Não executa um novo algoritmo de segmentação.
+-   Representa cada célula como centro e como polígono.
+-   Projeta a expressão de PIGR no espaço contínuo.
 
 ## Objeto preparado
 
@@ -1309,10 +1359,10 @@ p_poligonos + p_projecao +
 
 ## Leitura da comparação
 
-- Os vértices resumem a posição de cada célula.
-- Os polígonos preservam forma e área.
-- A projeção contínua mostra como o sinal se distribui entre os centros.
-- O GraphSpace mantém expressão, posição e geometria alinhadas [@RGraphSpace2026].
+-   Os vértices resumem a posição de cada célula.
+-   Os polígonos preservam forma e área.
+-   A projeção contínua mostra como o sinal se distribui entre os centros.
+-   O GraphSpace mantém expressão, posição e geometria alinhadas [@RGraphSpace2026].
 
 ```{r}
 #| label: segmentacao-liberar-memoria
@@ -1336,7 +1386,7 @@ invisible(gc())
 ## Anotação de tipos celulares
 
 | Método | Pergunta central | Referência |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | RCTD | quais tipos compõem cada spot? | @Cable2022RCTD |
 | cell2location | qual abundância espacial de tipos finos? | @Kleshchevnikov2022Cell2location |
 
@@ -1346,9 +1396,9 @@ Os dois métodos dependem de uma referência anotada e de compatibilidade entre 
 
 ![Genes selecionados e escalas espaciais estimadas pelo nnSVG. Fonte: Weber et al. (2023).](assets/downstream-nnsvg.png){width="88%" fig-align="center"}
 
-- SpatialDE modela padrões espaciais com processos gaussianos [@Svensson2018SpatialDE].
-- nnSVG usa aproximações por vizinhos para ganhar escala [@Weber2023NnSVG].
-- SPARK-X testa padrões espaciais sem um modelo paramétrico rígido [@Zhu2021SPARKX].
+-   SpatialDE modela padrões espaciais com processos gaussianos [@Svensson2018SpatialDE].
+-   nnSVG usa aproximações por vizinhos para ganhar escala [@Weber2023NnSVG].
+-   SPARK-X testa padrões espaciais sem um modelo paramétrico rígido [@Zhu2021SPARKX].
 
 ## Microambientes teciduais
 
@@ -1356,44 +1406,46 @@ Os dois métodos dependem de uma referência anotada e de compatibilidade entre 
 
 ## Modelos de microambientes
 
-- NCEM modela comunicação em grafos celulares [@Fischer2023NCEM].
-- Cottrazm reconstrói o microambiente tumoral ao longo do eixo maligno, borda e não maligno [@Xun2023TumorMicroenvironment].
+-   NCEM modela comunicação em grafos celulares [@Fischer2023NCEM].
+-   Cottrazm reconstrói o microambiente tumoral ao longo do eixo maligno, borda e não maligno [@Xun2023TumorMicroenvironment].
 
 ## Ecossistemas integrados
 
 **Squidpy**
 
-- grafos espaciais, estatísticas de vizinhança e imagens;
-- integração com o ecossistema Scanpy [@Palla2022Squidpy].
+-   grafos espaciais, estatísticas de vizinhança e imagens;
+-   integração com o ecossistema Scanpy [@Palla2022Squidpy].
 
 **Giotto**
 
-- visualização, domínios, vizinhanças e comunicação;
-- fluxo integrado para dados espaciais [@Dries2021Giotto].
+-   visualização, domínios, vizinhanças e comunicação;
+-   fluxo integrado para dados espaciais [@Dries2021Giotto].
 
 ## Alinhamento e reconstrução 3D
 
-::: {.columns}
+::::: columns
 ::: {.column width="76%"}
 ![Arquitetura do STAIR para alinhamento, integração e reconstrução de fatias.](assets/downstream-stair.png){width="100%"}
 :::
+
 ::: {.column width="24%"}
 ![Atlas 3D reconstruído.](assets/downstream-atlas3d.png){width="100%"}
 :::
-:::
+:::::
 
 STAIR combina alinhamento espacial e integração entre fatias [@Yu2025STAIR].
 
 ## Do 3D ao 4D
 
-::: {.columns}
+::::: columns
 ::: {.column width="55%"}
 ![Perspectiva sobre tecnologias espaciais e temporais para perfilamento 4D.](assets/downstream-4d-paper.png){width="100%"}
 :::
+
 ::: {.column width="45%"}
 ![Linha do tempo de tecnologias que combinam posição e tempo.](assets/downstream-4d-timeline.png){width="100%"}
 :::
-:::
+:::::
 
 O 4D incorpora dinâmica temporal à reconstrução espacial [@Reynolds2025FourD].
 
@@ -1406,7 +1458,7 @@ A escolha depende de resolução, área, sensibilidade, compatibilidade com hist
 ## Guia prático de decisão
 
 | Pergunta | Unidade de análise | Famílias de métodos |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | composição celular | spot ou célula | RCTD, cell2location |
 | padrão espacial de genes | gene e coordenadas | SpatialDE, nnSVG, SPARK-X |
 | nichos e microambientes | grafo espacial | NCEM, Cottrazm |
@@ -1426,31 +1478,20 @@ Material complementar do curso:
 
 Priorize a leitura da documentação do método, do artigo original e de benchmarks independentes.
 
-## Referências citadas {#refs .scrollable}
-
-## Atividade final
-
-Escolha um dos três resultados produzidos na aula:
-
-- tipos celulares do RCTD;
-- comunicação ligante-receptor;
-- expressão celular segmentada no Visium HD.
-
-Formule uma hipótese biológica e indique qual validação visual ou estatística seria necessária.
-
 ## Créditos
 
 SysbioLab, Laboratório de Bioinformática e Biologia de Sistemas, UFPR
 
-- Prof. Dr. Mauro Antônio Alves Castro
-- Jean S. S. Resende
-- Jonathan André Back
-- Lana Bazan Peters Querne
-- Flávio Gabriel Carazza-Kessler
+-   Prof. Dr. Mauro Antônio Alves Castro
+-   Jonathan André Back
+-   Lana Bazan Peters Querne
+-   Flávio Gabriel Carazza-Kessler
 
-[github.com/sysbiolab](https://github.com/sysbiolab)  
+[github.com/sysbiolab](https://github.com/sysbiolab)\
 [bioinfo.ufpr.br](https://bioinfo.ufpr.br)
 
 ## Obrigado
 
 Dúvidas?
+
+## Referências citadas {#refs .scrollable}
