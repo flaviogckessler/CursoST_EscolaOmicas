@@ -101,6 +101,44 @@
   width: 100%;
 }
 
+.reveal .code-result-slide pre {
+  font-size: 0.46em;
+  line-height: 1.12;
+  max-height: 37vh;
+}
+
+.reveal .expected-output {
+  margin-top: 0.18em;
+  text-align: center;
+}
+
+.reveal .expected-output figure {
+  margin: 0.08em auto;
+}
+
+.reveal .expected-output figure > img,
+.reveal .expected-output img {
+  height: auto;
+  max-height: 36vh;
+  max-width: 96%;
+  object-fit: contain;
+  width: auto;
+}
+
+.reveal .code-result-slide .cell-output-display {
+  margin-top: 0.15em;
+}
+
+.reveal .code-result-slide .cell-output-display img {
+  max-height: 36vh;
+  width: auto;
+}
+
+.reveal .scrollable pre {
+  font-size: 0.45em;
+  max-height: 66vh;
+}
+
 .reveal code {
   font-family: Consolas, "Liberation Mono", monospace;
 }
@@ -213,6 +251,11 @@
 .reveal section[data-background-color="#0B3B49"] h2,
 .reveal section[data-background-color="#0B3B49"] p {
   color: white;
+}
+
+.reveal section[data-background-color="#0B3B49"] a,
+.reveal section[data-background-color="#0B3B49"] a strong {
+  color: #65d6bf;
 }
 
 .reveal .columns {

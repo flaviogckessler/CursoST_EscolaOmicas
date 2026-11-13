@@ -4,26 +4,31 @@ Esta pasta contém a apresentação da terceira aula do curso, compilada a parti
 
 ## Prompt otimizado
 
-Objetivo: criar uma apresentação Quarto da Aula 03 em D:\CursoST_EscolaOmicas\apresentacoes\aula03, seguindo a organização e as opções de compilação da Aula 02.
+Objetivo: revisar e finalizar a Aula 03 em Quarto, produzindo slides RevealJS e um roteiro HTML a partir de fontes normativas explícitas.
 
 Fontes, nesta ordem:
 
 1. D:\CursoST_EscolaOmicas\vinhetas\RCTD_Deconvolution_stxbrain.Rmd
 2. D:\CursoST_EscolaOmicas\vinhetas\CellChat_Comunicacao_Celular_PathwaySpace.Rmd
 3. D:\CursoST_EscolaOmicas\vinhetas\Segmentacao_Celular_VisiumHD.Rmd
-4. D:\CursoST_EscolaOmicas\apresentacoes\Aula3_AnaliseDownstream_RNAseq_espacial.pptx, para o bloco final de referências e análises downstream
+4. D:\CursoST_EscolaOmicas\apresentacoes\aula03\Aula3_AnaliseDownstream_RNAseq_espacial.pptx, como referência para a sequência pedagógica, a teoria, os resultados e o bloco downstream
 
 Requisitos:
 
-- produzir uma apresentação RevealJS autocontida e um roteiro HTML;
-- preservar a sequência pedagógica das três vinhetas e, depois, das referências downstream;
-- manter nos slides o código necessário para reproduzir cada fluxo;
-- não executar a estimação completa do RCTD nem a inferência original do CellChat durante a compilação;
-- carregar os resultados pré-processados de resultados/ para mostrar sumários e figuras de RCTD e CellChat;
-- executar durante a compilação a exploração e a projeção da vinheta de segmentação Visium HD;
-- reutilizar os elementos gráficos úteis do PPTX e representar as animações relevantes com fragments do RevealJS;
-- corrigir caminhos relativos para que a compilação parta da pasta aula03;
-- validar a compilação, a presença dos três blocos práticos, os resultados renderizados e a legibilidade dos slides.
+- tratar o PPTX como fonte da ordem da aula e as três vinhetas Rmd como fontes normativas do código;
+- preservar no QMD as alterações já realizadas pelo autor;
+- não inventar funções auxiliares, nomes de objetos ou fluxos alternativos;
+- remover dos slides comentários sobre decisões internas de compilação ou colaboração;
+- acrescentar, no início de cada bloco prático, um link para a vinheta correspondente;
+- manter visível o código que produz cada captura da pasta assets;
+- nesses slides, mostrar primeiro o código e, no fragmento seguinte, o mesmo código acompanhado do resultado esperado;
+- não executar a estimação completa do RCTD nem a inferência do CellChat durante a renderização;
+- usar os resultados e as capturas já produzidos para as etapas pesadas;
+- executar os blocos mais leves da vinheta de segmentação Visium HD e imprimir os resultados;
+- preservar a sequência final de referências e análises downstream do PPTX;
+- produzir uma apresentação RevealJS autocontida e um roteiro HTML autocontido;
+- validar a fidelidade do código, a renderização, a presença dos três blocos e a legibilidade de códigos, figuras e tabelas;
+- nesta rodada, não realizar commit nem push.
 
 ## Arquivos
 

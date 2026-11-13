@@ -67,14 +67,6 @@ diretorio_dados <- file.path(diretorio_curso, "data")
 diretorio_resultados <- file.path(diretorio_curso, "resultados")
 diretorio_imagens <- file.path(diretorio_curso, "imagens")
 
-arquivo_obrigatorio <- function(...) {
-  caminho <- file.path(...)
-  if (!file.exists(caminho)) {
-    stop("Arquivo obrigatório não encontrado: ", caminho)
-  }
-  caminho
-}
-
 suppressPackageStartupMessages({
   library("ggplot2")
   library("knitr")
@@ -87,16 +79,26 @@ theme_set(
       legend.position = "right"
     )
 )
+
+arquivo_resumo_rctd <- file.path(
+  diretorio_resultados,
+  "stxbrain_RCTD_doublet_spot_summary.csv"
+)
+
+resumo_rctd <- read.csv(
+  arquivo_resumo_rctd,
+  row.names = 1,
+  check.names = FALSE
+)
+
+tab_classe_rctd <- as.data.frame(
+  table(resumo_rctd$spot_class),
+  stringsAsFactors = FALSE
+)
+names(tab_classe_rctd) <- c("classe", "spots")
 ```
 
 # Abertura {background-color="#0B3B49"}
-
-## Roteiro da aula
-
-1.  Deconvolução de spots Visium com RCTD
-2.  Comunicação célula-célula com CellChat e PathwaySpace
-3.  Segmentação celular em Visium HD
-4.  Referências e possibilidades de análise
 
 ## Roteiro da aula
 
@@ -105,8 +107,6 @@ theme_set(
 | RCTD | carregar 'stxBrain', preparar referência single-cell, construir objeto lido pelo RCTD, executar deconvolução, anotar spots no dado espacial |
 | CellChat | carregar 'stxBrain', preparar objeto CellChat, definir banco de dados de ligantes-receptores, inferir comunicação célula-célula, imputar dados à nível de spot, visualizar com pacote PathwaySpace |
 | Segmentação celular | carregar objeto preparado, inspecionar geometrias, representação das células como polígonos, visualização |
-
-> A apresentação usa resultados pré-processados quando a execução completa seria incompatível com o tempo disposto em aula.
 
 ## Encadeamento analítico
 
@@ -137,6 +137,8 @@ Como limites celulares mudam a representação espacial?
 ::::::
 
 # Deconvolução com RCTD {background-color="#0B3B49"}
+
+[Vinheta de referência: **RCTD — deconvolução do stxBrain**](../../vinhetas/RCTD_Deconvolution_stxbrain.html)
 
 ## Por que *deconvoluir* spots
 
@@ -194,28 +196,28 @@ O curso usa o modo *doublet* para manter o custo computacional controlado. A res
 ## Conferir o ambiente
 
 ```{r}
-#| label: rctd-pacotes-demonstracao
 #| eval: false
-
 pacotes_rctd <- c(
-  "Seurat", "SeuratObject", "SeuratData",
-  "Matrix", "ggplot2", "spacexr"
+  "Seurat", "SeuratObject", "SeuratData", "Matrix", "ggplot2", "spacexr"
 )
 
-ausentes <- pacotes_rctd[
+pacotes_rctd_ausentes <- pacotes_rctd[
   !vapply(pacotes_rctd, requireNamespace, logical(1), quietly = TRUE)
 ]
 
-if (length(ausentes) > 0) {
-  stop("Pacotes ausentes: ", paste(ausentes, collapse = ", "))
+if (length(pacotes_rctd_ausentes) > 0) {
+  stop(
+    "Execute primeiro Configuracao_do_ambiente_RStudio.Rmd. ",
+    "Pacotes ausentes: ",
+    paste(pacotes_rctd_ausentes, collapse = ", ")
+  )
 }
 ```
 
-::: fragment
-```{r}
-#| label: rctd-pacotes-demonstracao2
-#| eval: false
+## Diretórios e pacotes
 
+```{r}
+#| eval: false
 diretorio_vinhetas <- getwd()
 
 diretorio_curso <- dirname(diretorio_vinhetas)
@@ -226,212 +228,295 @@ diretorio_resultados <- file.path(diretorio_curso, "resultados")
 dir.create(diretorio_dados, showWarnings = FALSE, recursive = TRUE)
 dir.create(diretorio_imagens, showWarnings = FALSE, recursive = TRUE)
 dir.create(diretorio_resultados, showWarnings = FALSE, recursive = TRUE)
+```
 
-diretorio_curso
-diretorio_dados
-diretorio_imagens
-diretorio_resultados
+::: fragment
+```{r}
+#| eval: false
+library("Seurat")
+library("SeuratData")
+library("Matrix")
+library("ggplot2")
+library("spacexr")
+
+options(stringsAsFactors = FALSE)
 ```
 :::
 
 ## Carregar a amostra espacial
 
 ```{r}
-#| label: rctd-carregar-stxbrain-demonstracao
 #| eval: false
+if (!requireNamespace("stxBrain.SeuratData", quietly = TRUE)) {
+  stop(
+    "O conjunto stxBrain não está instalado.\nExecute primeiro a vinheta ",
+    "Configuracao_do_ambiente_RStudio.Rmd: \n",
+    "https://flaviogckessler.github.io/Curso_ST/vinhetas/Configuracao_do_ambiente_RStudio.html"
+  )
+}
 
-library("Seurat")
-library("SeuratData")
+message("O conjunto stxBrain já foi instalado.")
 
-stxbrain <- SeuratData::LoadData(
-  "stxBrain",
-  type = "anterior1"
-)
+stxbrain <- SeuratData::LoadData("stxBrain", type = "anterior1")
+stxbrain
 ```
 
-## Contagens brutas
+## Contagens espaciais brutas {.code-result-slide}
 
 ```{r}
-#| label: rctd-contagens-demonstracao
 #| eval: false
-
 contagens_espaciais <- SeuratObject::LayerData(
   object = stxbrain,
   assay = "Spatial",
   layer = "counts"
 )
 
-dim(contagens_espaciais)
+print(paste("Número de spots:",dim(contagens_espaciais)[2]))
+print(paste("Número de genes:",dim(contagens_espaciais)[1]))
+
+contagens_espaciais[
+   seq_len(min(5L, nrow(contagens_espaciais))),
+   seq_len(min(5L, ncol(contagens_espaciais))),
+   drop = FALSE]
+```
+
+::: {.fragment .expected-output}
+![Contagens inteiras da camada Spatial.](assets/spatialcounts_brutas_RCTD.png){width="82%"}
+:::
+
+## Profundidade por spot {.code-result-slide}
+
+```{r}
+#| eval: false
 summary(Matrix::colSums(contagens_espaciais))
 ```
 
-O RCTD recebe a camada counts. Dados normalizados por NormalizeData ou SCTransform não devem substituir as contagens brutas.
+::: {.fragment .expected-output}
+![Resumo do total de transcritos por spot.](assets/valoresinteiros_RCTD.png){width="62%"}
+:::
 
-## Coordenadas dos spots
+## Coordenadas dos spots {.code-result-slide}
 
 ```{r}
-#| label: rctd-coordenadas-demonstracao
 #| eval: false
-
 nome_imagem <- SeuratObject::Images(stxbrain)[1]
-
-coordenadas <- SeuratObject::GetTissueCoordinates(
+coordenadas_espaciais <- SeuratObject::GetTissueCoordinates(
   object = stxbrain,
   image = nome_imagem,
   scale = NULL
 )
 
-coordenadas <- as.data.frame(
-  coordenadas[, c("x", "y"), drop = FALSE]
+coordenadas_espaciais <- as.data.frame(
+  coordenadas_espaciais[, c("x", "y"), drop = FALSE]
 )
-
-coordenadas <- coordenadas[
-  colnames(contagens_espaciais),
-  ,
-  drop = FALSE
+coordenadas_espaciais <- coordenadas_espaciais[
+  colnames(contagens_espaciais), , drop = FALSE
 ]
+
+head(coordenadas_espaciais)
 ```
 
-## Referência single-cell
+::: {.fragment .expected-output}
+![Coordenadas alinhadas às colunas da matriz de contagens.](assets/coordenadas_RCTD.png){width="72%"}
+:::
+
+## Referência single-cell {.code-result-slide}
 
 ```{r}
-#| label: rctd-referencia-download-demonstracao
 #| eval: false
+arquivo_referencia <- file.path(diretorio_dados, "allen_cortex.rds")
 
-arquivo_referencia <- file.path(
-  diretorio_dados,
-  "allen_cortex.rds"
-)
+if (!file.exists(arquivo_referencia)) {
+  stop(
+    "A referência single-cell não foi encontrada em: ",
+    arquivo_referencia,
+    "\nBaixe o arquivo como descrito acima ou copie o arquivo fornecido pelo instrutor para data/."
+  )
+}
 
 referencia_allen <- readRDS(arquivo_referencia)
+metadados_referencia <- referencia_allen[[]]
 
 contagens_referencia <- SeuratObject::LayerData(
-  referencia_allen,
+  object = referencia_allen,
   assay = "RNA",
   layer = "counts"
 )
-
-metadados_referencia <- referencia_allen[[]]
+head(contagens_referencia[,1:5])
 ```
 
-## Rótulos e tipos raros
+::: {.fragment .expected-output}
+::::: columns
+::: {.column width="49%"}
+![Matriz de contagens da referência.](assets/matrixContagemReferencia_RCTD.png){width="100%"}
+:::
+::: {.column width="49%"}
+![Metadados da referência.](assets/metadadosReferencia_RCTD.png){width="100%"}
+:::
+:::::
+:::
+
+## Rótulos e tipos raros {.code-result-slide}
 
 ```{r}
-#| label: rctd-filtrar-referencia-demonstracao
 #| eval: false
+metadados_referencia <- metadados_referencia[
+  colnames(contagens_referencia), , drop = FALSE
+]
 
-tipos <- as.character(metadados_referencia$subclass)
-tipos <- gsub("/", "-", tipos, fixed = TRUE)
+tipos_celulares_referencia <- as.character(
+  metadados_referencia$subclass
+)
+tipos_celulares_referencia <- gsub(
+  "/", "-", tipos_celulares_referencia, fixed = TRUE
+)
 
-validas <- !is.na(tipos) & nzchar(tipos)
-tamanhos <- table(tipos[validas])
-tipos_elegiveis <- names(tamanhos[tamanhos >= 25])
-validas <- validas & tipos %in% tipos_elegiveis
+celulas_validas <- !is.na(tipos_celulares_referencia) &
+  nzchar(tipos_celulares_referencia)
 
-contagens_referencia <- contagens_referencia[, validas]
-tipos <- droplevels(factor(tipos[validas]))
+tamanhos_tipos <- table(tipos_celulares_referencia[celulas_validas])
+tipos_elegiveis <- names(tamanhos_tipos[tamanhos_tipos >= 25])
+celulas_validas <- celulas_validas &
+  tipos_celulares_referencia %in% tipos_elegiveis
 ```
 
-O filtro mantém tipos celulares com pelo menos 25 células na referência.
+::: {.fragment .expected-output}
+![Tipos celulares mantidos após o filtro mínimo de 25 células.](assets/PrintReferenciaFiltrada_RCTD.png){width="84%"}
+:::
 
-## Genes compartilhados
+## Filtrar a matriz da referência
 
 ```{r}
-#| label: rctd-genes-demonstracao
 #| eval: false
+contagens_referencia <- contagens_referencia[
+  , celulas_validas, drop = FALSE
+]
+tipos_celulares_referencia <- droplevels(
+  factor(tipos_celulares_referencia[celulas_validas])
+)
 
+print(paste("N° de células de referência: ",ncol(contagens_referencia)))
+print("Células de referência:")
+levels(tipos_celulares_referencia)
+```
+
+O filtro padrão mantém somente tipos celulares representados por pelo menos 25 células.
+
+## Genes compartilhados {.code-result-slide}
+
+```{r}
+#| eval: false
 genes_comuns <- intersect(
   rownames(contagens_espaciais),
   rownames(contagens_referencia)
 )
 
-contagens_espaciais <- contagens_espaciais[genes_comuns, ]
-contagens_referencia <- contagens_referencia[genes_comuns, ]
+resumo_genes <- data.frame(
+  fonte = c("amostra espacial", "referência single-cell", "interseção"),
+  numero_de_genes = c(
+    nrow(contagens_espaciais),
+    nrow(contagens_referencia),
+    length(genes_comuns)
+  )
+)
+resumo_genes
+
+contagens_espaciais <- contagens_espaciais[
+  genes_comuns, , drop = FALSE
+]
+contagens_referencia <- contagens_referencia[
+  genes_comuns, , drop = FALSE
+]
 ```
 
-Na execução de referência, a interseção contém mais de 19 mil genes.
+::: {.fragment .expected-output}
+![Número de genes na amostra, na referência e na interseção.](assets/intersecaoRefEsp_RCTD.png){width="62%"}
+:::
 
-## Objetos de entrada
+## Objetos de entrada do spacexr {.code-result-slide}
 
 ```{r}
-#| label: rctd-objetos-demonstracao
 #| eval: false
-
-names(tipos) <- colnames(contagens_referencia)
+names(tipos_celulares_referencia) <- colnames(contagens_referencia)
 
 referencia_rctd <- spacexr::Reference(
   contagens_referencia,
-  tipos,
+  tipos_celulares_referencia,
   Matrix::colSums(contagens_referencia)
 )
 
 consulta_rctd <- spacexr::SpatialRNA(
-  coordenadas,
+  as.data.frame(coordenadas_espaciais),
   contagens_espaciais,
   Matrix::colSums(contagens_espaciais)
 )
+
+data.frame(objeto = c("referencia_rctd", "consulta_rctd"),
+  genes = c(nrow(referencia_rctd@counts),nrow(consulta_rctd@counts)),
+  unidades = c(ncol(referencia_rctd@counts),ncol(consulta_rctd@counts)),
+  tipo_de_unidade = c("células", "spots"))
 ```
 
-## Ajuste completo
+::: {.fragment .expected-output}
+![Dimensões dos objetos de referência e consulta.](assets/objetos_RCTD.png){width="70%"}
+:::
+
+## Criar e executar o RCTD
 
 ```{r}
-#| label: rctd-ajuste-demonstracao
 #| eval: false
-
 set.seed(20260904)
+
+numero_nucleos <- 1
 
 RCTD <- spacexr::create.RCTD(
   consulta_rctd,
   referencia_rctd,
-  max_cores = 1
+  max_cores = numero_nucleos
 )
+
+inicio_rctd <- Sys.time()
 
 RCTD <- spacexr::run.RCTD(
   RCTD,
   doublet_mode = "doublet"
 )
+
+fim_rctd <- Sys.time()
+tempo_rctd <- fim_rctd - inicio_rctd
+tempo_rctd
 ```
 
-Este bloco aparece para documentar a reprodução, mas não é executado na compilação.
+> CUIDADO: Este bloco é o mais pesado da aula, não rode na sua máquina enquanto você não garantir a estrutura necessária.
 
-## Resultados pré-computados
+## Inspecionar os resultados {.code-result-slide}
 
 ```{r}
-#| label: rctd-carregar-resumo
-#| results: hide
+#| eval: false
+resultado_spots <- RCTD@results$results_df
+pesos_doublet <- as.data.frame(RCTD@results$weights_doublet)
+colnames(pesos_doublet) <- c("peso_primeiro_tipo", "peso_segundo_tipo")
 
-arquivo_resumo_rctd <- arquivo_obrigatorio(
-  diretorio_resultados,
-  "stxbrain_RCTD_doublet_spot_summary.csv"
-)
+resumo_spots_rctd <- cbind(resultado_spots, pesos_doublet)
 
-resumo_rctd <- read.csv(
-  arquivo_resumo_rctd,
-  row.names = 1,
-  check.names = FALSE
-)
-
-tab_classe_rctd <- as.data.frame(
-  table(resumo_rctd$spot_class),
-  stringsAsFactors = FALSE
-)
-
-names(tab_classe_rctd) <- c("classe", "spots")
-tab_classe_rctd <- tab_classe_rctd[
-  order(tab_classe_rctd$spots, decreasing = TRUE),
-]
-
+head(resumo_spots_rctd)
+table(resumo_spots_rctd$spot_class)
 ```
+
+::: {.fragment .expected-output}
+![Classificação, tipos celulares e pesos estimados por spot.](assets/savedCSV_RCTD.png){width="92%"}
+:::
 
 ## Composição das classes
 
 ```{r}
 #| label: rctd-grafico-classes
-#| echo: false
+#| echo: true
 #| fig-width: 9
-#| fig-height: 5.5
-#| out-width: "82%"
+#| fig-height: 5.2
+#| out-width: "76%"
 #| fig-align: center
+#| output-location: fragment
 
 ggplot(
   tab_classe_rctd,
@@ -449,81 +534,67 @@ ggplot(
   theme(panel.grid.major.y = element_blank())
 ```
 
-Dos 2.696 spots, 2.483 receberam a classe doublet_certain.
-
-## Tabela de anotações
+## Acrescentar as anotações ao Seurat
 
 ```{r}
-#| label: rctd-tabela-resultados
-#| echo: false
-
-colunas_rctd <- c(
-  "spot_class",
-  "first_type",
-  "second_type",
-  "peso_primeiro_tipo",
-  "peso_segundo_tipo"
-)
-
-knitr::kable(
-  head(resumo_rctd[, colunas_rctd], 6),
-  row.names = FALSE,
-  digits = 3
+#| eval: false
+stxbrain <- SeuratObject::AddMetaData(
+  object = stxbrain,
+  metadata = resumo_spots_rctd
 )
 ```
 
-## Mapa calculado no build
+As linhas de resumo são alinhadas aos spots pelos códigos de barras.
+
+## Classificação espacial {.code-result-slide}
 
 ```{r}
-#| label: rctd-mapa-executado
-#| echo: false
-#| fig-width: 12
-#| fig-height: 5
-#| out-width: "92%"
-#| fig-align: center
-
-suppressPackageStartupMessages({
-  library("Seurat")
-  library("patchwork")
-})
-
-arquivo_seurat_rctd <- arquivo_obrigatorio(
-  diretorio_resultados,
-  "stxbrain_Seurat_com_RCTD.rds"
-)
-
-stxbrain_rctd <- readRDS(arquivo_seurat_rctd)
-
-p_classe <- SpatialDimPlot(
-  stxbrain_rctd,
+#| eval: false
+p_classes <- Seurat::SpatialDimPlot(
+  object = stxbrain,
+  images = nome_imagem,
   group.by = "spot_class",
-  pt.size.factor = 1.25
-) + ggtitle("Classe do spot")
+  pt.size.factor = 1.6,
+  crop = TRUE
+) +
+  labs(title = "Classificação dos spots pelo RCTD")
 
-p_tipo <- SpatialDimPlot(
-  stxbrain_rctd,
-  group.by = "first_type",
-  pt.size.factor = 1.25
-) + ggtitle("Primeiro tipo celular")
-
-p_classe + p_tipo
+p_classes
 ```
 
-## Primeiro e segundo tipo celular
-
-::::: columns
-::: {.column width="50%"}
-![Primeiro tipo celular atribuído em cada spot.](assets/rctd-primeiro-tipo.png){width="100%"}
+::: {.fragment .expected-output}
+![Classificação dos spots pelo RCTD.](assets/rctd-classificacao-spots.png){width="72%"}
 :::
 
-::: {.column width="50%"}
-![Segundo tipo celular atribuído em cada spot.](assets/rctd-segundo-tipo.png){width="100%"}
+## Primeiro e segundo tipos celulares {.code-result-slide}
+
+```{r}
+#| eval: false
+p1 <- Seurat::SpatialDimPlot(
+  object = stxbrain,
+  images = nome_imagem,
+  group.by = "first_type",
+  pt.size.factor = 1.6,
+  crop = TRUE
+) +
+  labs(title = "Primeiro tipo celular")
+
+p2 <- Seurat::SpatialDimPlot(
+  object = stxbrain,
+  images = nome_imagem,
+  group.by = "second_type",
+  pt.size.factor = 1.6,
+  crop = TRUE
+) +
+  labs(title = "Segundo tipo celular")
+
+p_tipos <- p1 + p2
+p_tipos
+```
+
+::: {.fragment .expected-output}
+![Comparação entre o primeiro e o segundo tipo celular.](assets/rctd-tipos-combinados.png){width="88%"}
 :::
-:::::
-
-## Composição celular no tecido
-
-![Mapas combinados dos tipos celulares inferidos pelo RCTD.](assets/rctd-tipos-combinados.png){width="88%" fig-align="center"}
 
 ## Interpretação do modo doublet
 
@@ -533,21 +604,39 @@ p_classe + p_tipo
 -   reject: nenhuma atribuição confiável.
 -   Os pesos descrevem a composição estimada e dependem da referência usada.
 
-```{r}
-#| label: rctd-liberar-memoria
-#| include: false
+## Salvar resultados reutilizáveis
 
-rm(stxbrain_rctd, p_classe, p_tipo)
-invisible(gc())
+```{r}
+#| eval: false
+write.csv(
+  resumo_spots_rctd,
+  file = file.path(
+    diretorio_resultados,
+    "stxbrain_RCTD_doublet_spot_summary.csv"
+  ),
+  row.names = TRUE
+)
+
+saveRDS(
+  stxbrain,
+  file = file.path(
+    diretorio_resultados,
+    "stxbrain_Seurat_com_RCTD.rds"
+  )
+)
 ```
 
 # Comunicação celular {background-color="#0B3B49"}
+
+[Vinheta de referência: **CellChat e PathwaySpace**](../../vinhetas/CellChat_Comunicacao_Celular_PathwaySpace.html)
 
 ## Pergunta biológica
 
 O CellChat busca relações entre ligantes expressos por uma população e receptores expressos por outra [@Jin2021CellChat; @Jin2025CellChat].
 
-No espacial, a expressão não basta. A distância entre as populações também precisa ser representada.
+No tecido, a expressão precisa ser interpretada junto com a proximidade espacial.
+
+![Visão geral da comunicação célula--célula.](assets/imgIlustrativa_CellChat.png){width="68%" fig-align="center"}
 
 ## Do cluster ao tecido
 
@@ -557,118 +646,190 @@ No espacial, a expressão não basta. A distância entre as populações também
 4.  Associar a comunicação às arestas da rede.
 5.  Projetar o sinal com PathwaySpace.
 
-## Entradas do CellChat
+## Inferência das redes de comunicação
+
+![Modelagem das redes, identificação de padrões e classificação dos sinais.](assets/model_CellChat.png){height="62%" fig-align="center"}
+
+## Probabilidade de comunicação
+
+![Relações entre ligantes, receptores e cofatores no modelo do CellChat.](assets/model1_CellChat.png){height="62%" fig-align="center"}
+
+## Entrada: expressão e grupos
+
+![Perfis de expressão e rótulos dos grupos celulares.](assets/input1_CellChat.png){height="62%" fig-align="center"}
+
+## Entrada: interações ligante--receptor
+
+![Base de ligantes, receptores, agonistas, antagonistas e cofatores.](assets/input2_CellChat.png){height="62%" fig-align="center"}
+
+## Carregar a seção anterior
 
 ```{r}
-#| label: cellchat-entradas-demonstracao
 #| eval: false
+brain <- readRDS(file.path(diretorio_dados, "brain.RDS"))
+brain <- subset(brain, subset = region == "anterior")
 
-brain <- readRDS(
-  file.path(diretorio_dados, "brain.RDS")
-)
+DefaultAssay(brain) <- "SCT"
+Idents(brain) <- "seurat_clusters"
 
-dados_expressao <- SeuratObject::LayerData(
-  brain,
-  assay = "Spatial",
-  layer = "data"
-)
+if (length(Images(brain)) != 1L) {
+  stop("O subset da região anterior deve manter exatamente uma imagem espacial.")
+}
 
-metadados <- brain[[]]
-metadados$labels <- brain$seurat_clusters
+nome_imagem <- Images(brain)[1]
+
+brain
+table(brain$region)
 ```
 
-O objeto completo tem aproximadamente 1 GB. Por isso, a inferência não é repetida no build.
+O resultado esperado é um objeto com 2.696 spots e uma única imagem, denominada anterior1.
 
-## Coordenadas e escala física
+## Expressão e metadados {.code-result-slide}
 
 ```{r}
-#| label: cellchat-coordenadas-demonstracao
 #| eval: false
+data.input <- LayerData(brain, assay = "SCT", layer = "data")
+spots_anterior <- Cells(brain[[nome_imagem]])
+data.input <- data.input[, spots_anterior, drop = FALSE]
 
-coordenadas <- SeuratObject::GetTissueCoordinates(
-  brain,
-  image = "anterior1",
-  scale = NULL
+metadados_brain <- brain[[]]
+
+meta <- data.frame(
+  labels = paste0("cluster_",
+    metadados_brain[colnames(data.input), "seurat_clusters"]),
+  samples = nome_imagem,
+  row.names = colnames(data.input)
 )
 
-fatores_espaciais <- data.frame(
-  ratio = 1,
-  tol = 55
-)
+meta$labels <- factor(meta$labels)
+meta$samples <- factor(meta$samples, levels = nome_imagem)
+
+table(meta$labels, meta$samples)
 ```
 
-O intervalo de interação por contato e a rede de proximidade usam a escala física do Visium, com centros de spots separados por aproximadamente 100 micrômetros.
+::: {.fragment .expected-output}
+![Número de spots por cluster na seção anterior.](assets/spotsPorCluster_CellChat.png){width="58%"}
+:::
 
-## Criar o objeto
+## Coordenadas e escala física {.code-result-slide}
 
 ```{r}
-#| label: cellchat-criar-demonstracao
 #| eval: false
+spatial.locs <- GetTissueCoordinates(
+  brain, image = nome_imagem, scale = NULL)
+spatial.locs <- as.data.frame(spatial.locs[, c("x", "y"), drop = FALSE])
+spatial.locs <- spatial.locs[colnames(data.input), , drop = FALSE]
 
+spot.size <- 55
+distancia_centros <- 100
+distancias <- computeCellDistance(coordinates = spatial.locs)
+menor_distancia <- min(distancias[distancias > 0])
+
+spatial.factors <- data.frame(
+  ratio = distancia_centros / menor_distancia,
+  tol = spot.size / 2,
+  row.names = nome_imagem
+)
+
+spatial.factors
+head(spatial.locs)
+```
+
+::: {.fragment .expected-output}
+::::: columns
+::: {.column width="68%"}
+![Coordenadas espaciais alinhadas à expressão.](assets/coord_CellChat.png){width="100%"}
+:::
+::: {.column width="30%"}
+![Fator de conversão espacial.](assets/ratio.png){width="100%"}
+:::
+:::::
+:::
+
+## Criar o objeto CellChat {.code-result-slide}
+
+```{r}
+#| eval: false
 cellchat <- createCellChat(
-  object = dados_expressao,
-  meta = metadados,
-  group.by = "labels",
-  datatype = "spatial",
-  coordinates = coordenadas,
-  spatial.factors = fatores_espaciais
+  object = data.input, meta = meta, group.by = "labels",
+  datatype = "spatial", coordinates = spatial.locs,
+  spatial.factors = spatial.factors
 )
 
+cellchat
+```
+
+::: {.fragment .expected-output}
+![Resumo do objeto CellChat espacial.](assets/CellChat_Object_CellChat.png){width="82%"}
+:::
+
+## Banco de interações {.code-result-slide}
+
+```{r}
+#| eval: false
 CellChatDB <- CellChatDB.mouse
-CellChatDB.use <- subsetDB(
-  CellChatDB,
-  search = "Secreted Signaling"
-)
+showDatabaseCategory(CellChatDB)
+
+CellChatDB.use <- subsetDB(CellChatDB,
+  search = "Secreted Signaling", key = "annotation")
 
 cellchat@DB <- CellChatDB.use
 ```
 
-## Pré-processamento e inferência
+::: {.fragment .expected-output}
+![Categorias de interação disponíveis no CellChatDB.mouse.](assets/CellChatDB_CellChat.png){width="68%"}
+:::
+
+## Pré-processar e inferir
 
 ```{r}
-#| label: cellchat-inferencia-demonstracao
 #| eval: false
-
 cellchat <- subsetData(cellchat)
+
+future::plan("multisession", workers = 4)
+
 cellchat <- identifyOverExpressedGenes(cellchat)
-cellchat <- identifyOverExpressedInteractions(cellchat)
+cellchat <- identifyOverExpressedInteractions(cellchat, variable.both = FALSE)
 
 cellchat <- computeCommunProb(
-  cellchat,
-  type = "triMean",
-  distance.use = TRUE,
-  interaction.range = 100,
-  contact.range = 100
+  cellchat, type = "triMean", distance.use = TRUE,
+  interaction.range = 100, scale.distance = 0.01,
+  contact.range = 100, contact.dependent = TRUE,
+  contact.knn.k = 6, nboot = 10
 )
 
-cellchat <- filterCommunication(
-  cellchat,
-  min.cells = 10
-)
+cellchat <- filterCommunication(cellchat, min.cells = 10)
 ```
 
-## Projetar clusters para pares de spots
+> CUIDADO: Esta é a etapa mais custosa da vinheta. O número de permutações foi limitado a 10 para a atividade didática.
+
+## Comunicações entre clusters {.code-result-slide}
 
 ```{r}
-#| label: cellchat-spots-demonstracao
 #| eval: false
+df.net <- subsetCommunication(cellchat, thresh = 0.05)
 
-comunicacoes_cluster <- subsetCommunication(cellchat)
+df.net <- df.net %>%
+  mutate(source = as.character(source), target = as.character(target))
 
+head(df.net)
+```
+
+::: {.fragment .expected-output}
+![Tabela de interações inferidas entre clusters.](assets/result1_dataframe_CellChat.png){width="94%"}
+:::
+
+## Pares de spots próximos {.code-result-slide}
+
+```{r}
+#| eval: false
 interaction.range <- 100
 
-coordenadas_um <- spatial.locs *
-  spatial.factors[nome_imagem, "ratio"]
-
-matriz_distancias <- as.matrix(
-  dist(coordenadas_um)
-)
+coordenadas_um <- spatial.locs * spatial.factors[nome_imagem, "ratio"]
+matriz_distancias <- as.matrix(dist(coordenadas_um))
 diag(matriz_distancias) <- Inf
 
-indices <- which(
-  matriz_distancias <= interaction.range,
-  arr.ind = TRUE
-)
+indices <- which(matriz_distancias <= interaction.range, arr.ind = TRUE)
 
 spot.pairs <- tibble(
   source_spot = rownames(matriz_distancias)[indices[, 1]],
@@ -677,302 +838,319 @@ spot.pairs <- tibble(
   sample = nome_imagem
 )
 
-spot.groups <- tibble(
-  spot = rownames(cellchat@meta),
-  group = as.character(cellchat@idents)
-)
+spot.groups <- tibble(spot = rownames(cellchat@meta),
+  group = as.character(cellchat@idents))
+```
 
-spot.pairs <- spot.pairs |>
-  left_join(
-    spot.groups,
-    by = c("source_spot" = "spot")
-  ) |>
-  rename(source = group) |>
-  left_join(
-    spot.groups,
-    by = c("target_spot" = "spot")
-  ) |>
+::: {.fragment .expected-output}
+![Pares de spots dentro do intervalo espacial.](assets/result2_porSpot_CellChat.png){width="86%"}
+:::
+
+## Projetar clusters nos pares de spots
+
+```{r}
+#| eval: false
+spot.pairs <- spot.pairs %>%
+  left_join(spot.groups, by = c("source_spot" = "spot")) %>%
+  rename(source = group) %>%
+  left_join(spot.groups, by = c("target_spot" = "spot")) %>%
   rename(target = group)
 
-spot.to.spot.communication <- spot.pairs |>
-  inner_join(
-    comunicacoes_cluster,
-    by = c("source", "target")
-  ) |>
-  arrange(
-    sample,
-    source_spot,
-    target_spot,
-    pathway_name,
-    interaction_name
-  )
+head(spot.pairs)
+```
+
+Cada par recebe o cluster do spot de origem e o cluster do spot de destino.
+
+## Combinar e salvar as comunicações {.code-result-slide}
+
+```{r}
+#| eval: false
+spot.to.spot.communication <- spot.pairs %>%
+  inner_join(df.net, by = c("source", "target")) %>%
+  arrange(sample, source_spot, target_spot,
+    pathway_name, interaction_name)
+
+head(spot.to.spot.communication)
 
 saveRDS(
   spot.to.spot.communication,
-  file.path(
-    diretorio_resultados,
-    "spot-spot_commu_anterior.rds"
-  )
+  file = file.path(diretorio_resultados,
+    "spot-spot_commu_anterior.rds")
 )
 ```
 
-## Resultado reutilizável
+::: {.fragment .expected-output}
+![Comunicações projetadas para pares de spots.](assets/output_CellChat.png){width="88%"}
+:::
+
+## Construir o GraphSpace
 
 ```{r}
-#| label: cellchat-carregar-resultados
-#| results: hide
-#| cache: false
-
-suppressPackageStartupMessages({
-  library("dplyr")
-})
-
-arquivo_comunicacoes <- arquivo_obrigatorio(
-  diretorio_resultados,
-  "spot-spot_commu_anterior.rds"
-)
-
-comunicacoes <- readRDS(arquivo_comunicacoes)
-
-resumo_cellchat <- data.frame(
-  metrica = c(
-    "linhas",
-    "pares direcionados de spots",
-    "interações ligante-receptor",
-    "vias"
-  ),
-  valor = c(
-    nrow(comunicacoes),
-    n_distinct(paste(
-      comunicacoes$source_spot,
-      comunicacoes$target_spot,
-      sep = "::"
-    )),
-    n_distinct(comunicacoes$interaction_name),
-    n_distinct(comunicacoes$pathway_name)
-  )
-)
-
-```
-
-## Escala do resultado CellChat
-
-::::::: {.columns .metric-row}
-::: {.column width="24%"}
-[`r format(nrow(comunicacoes), big.mark = ".", decimal.mark = ",", scientific = FALSE)`]{.result-number}
-
-[registros ligante-receptor projetados]{.result-label}
-:::
-
-::: {.column width="24%"}
-[`r format(dplyr::n_distinct(paste(comunicacoes$source_spot, comunicacoes$target_spot, sep = "::")), big.mark = ".", decimal.mark = ",", scientific = FALSE)`]{.result-number}
-
-[pares direcionados de spots]{.result-label}
-:::
-
-::: {.column width="24%"}
-[`r dplyr::n_distinct(comunicacoes$interaction_name)`]{.result-number}
-
-[interações ligante-receptor]{.result-label}
-:::
-
-::: {.column width="24%"}
-[`r dplyr::n_distinct(comunicacoes$pathway_name)`]{.result-number}
-
-[vias de sinalização]{.result-label}
-:::
-:::::::
-
-::: source-note
-As linhas resultam da projeção das comunicações inferidas entre clusters sobre pares de spots vizinhos.
-:::
-
-## Interações mais frequentes
-
-```{r}
-#| label: cellchat-top-interacoes
-#| results: hide
-
-top_interacoes <- comunicacoes |>
-  mutate(
-    par = paste(ligand, receptor, sep = " - ")
-  ) |>
-  group_by(par, pathway_name) |>
-  summarise(
-    pares_de_spots = n(),
-    probabilidade_media = mean(prob, na.rm = TRUE),
-    .groups = "drop"
-  ) |>
-  arrange(desc(pares_de_spots), desc(probabilidade_media)) |>
-  slice_head(n = 10)
-
-```
-
-## Interações dominantes no tecido
-
-```{r}
-#| label: cellchat-tabela-top
-#| echo: false
-
-top_interacoes |>
-  slice_head(n = 8) |>
-  knitr::kable(
-    row.names = FALSE,
-    digits = 4,
-    col.names = c(
-      "Ligante - receptor",
-      "Via",
-      "Pares de spots",
-      "Probabilidade m&eacute;dia"
-    ),
-    escape = FALSE
-  )
-```
-
-::: source-note
-A contagem informa em quantos pares de spots cada interação aparece após a projeção espacial.
-:::
-
-## Frequência nos pares de spots
-
-```{r}
-#| label: cellchat-grafico-top
-#| echo: false
-#| fig-width: 10.5
-#| fig-height: 6.2
-#| out-width: "86%"
-#| fig-align: center
-
-ggplot(
-  top_interacoes,
-  aes(
-    x = reorder(par, pares_de_spots),
-    y = pares_de_spots,
-    fill = pathway_name
-  )
-) +
-  geom_col(width = 0.76) +
-  coord_flip() +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    x = NULL,
-    y = "Pares de spots",
-    fill = "Via"
-  ) +
-  theme(panel.grid.major.y = element_blank())
-```
-
-::: source-note
-O gráfico resume a frequência espacial das dez interações mais representadas no resultado reutilizável.
-:::
-
-## Rede espacial no GraphSpace
-
-```{r}
-#| label: cellchat-graphspace-demonstracao
 #| eval: false
+spots_visualizacao <- spots_anterior
 
-gs <- as.GraphSpace(
-  brain,
-  space = "spatial",
-  scale = "lowres"
+coordenadas_gs <- GetTissueCoordinates(
+  brain, image = nome_imagem, scale = "lowres"
+)
+coordenadas_gs <- coordenadas_gs[
+  spots_visualizacao, c("x", "y"), drop = FALSE
+]
+
+metadados_gs <- brain[[]][spots_visualizacao, , drop = FALSE]
+gs <- GraphSpace(cbind(coordenadas_gs, metadados_gs))
+
+gs_fdata(gs) <- LayerData(
+  brain, assay = "SCT", layer = "data"
+)[, spots_visualizacao, drop = FALSE]
+
+gs_image(gs) <- GetImage(
+  brain[[nome_imagem]], mode = "raster"
 )
 
-gs_image(gs) <- SeuratObject::GetImage(
-  brain,
-  mode = "raster"
+gs <- normalizeGraphSpace(gs)
+```
+
+## Clusters no GraphSpace {.code-result-slide}
+
+```{r}
+#| eval: false
+spatial_theme <- theme_gspace_coords(
+  theme = "th3", is_norm = TRUE,
+  xlab = "Coordenada espacial 1", ylab = "Coordenada espacial 2"
 )
 
-gs <- normalizeGraphSpace(
-  gs,
-  swap.xy = TRUE
-)
+cpal1 <- DiscretePalette(nlevels(gs$seurat_clusters), "polychrome")
 
+ggplot(gs) +
+  annotation_gspace_image(gs) +
+  geom_nodespace(mapping = aes(colour = seurat_clusters),
+    size = 1, pch = 19) +
+  scale_colour_manual(values = cpal1) +
+  theme_gspace_legend(discrete_colour = TRUE) +
+  spatial_theme
+```
+
+::: {.fragment .expected-output}
+![Distribuição espacial dos clusters.](assets/clusters_CellChat.png){width="72%"}
+:::
+
+## Rede de proximidade {.scrollable}
+
+```{r}
+#| eval: false
+proximityNetwork <- function(gs, nnei = 6) {
+  nodes <- gs@nodes
+
+  vizinhos <- RANN::nn2(nodes[, c("x", "y")],
+    nodes[, c("x", "y")], k = nnei + 1)
+
+  distancias <- as.data.frame(vizinhos$nn.dists[, 2:(nnei + 1)])
+  indices <- as.data.frame(vizinhos$nn.idx[, 2:(nnei + 1)])
+
+  distancia_tipica <- 1 / mean(1 / distancias$V1)
+  manter <- distancias
+  manter[, 1] <- TRUE
+  manter[, 2:ncol(manter)] <-
+    distancias[, 2:ncol(distancias)] >= 0.95 * distancia_tipica &
+    distancias[, 2:ncol(distancias)] <= 1.05 * distancia_tipica
+
+  matriz_arestas <- manter * indices
+  matriz_arestas$from <- row.names(matriz_arestas)
+
+  arestas <- matriz_arestas %>%
+    pivot_longer(cols = -from, names_to = "vizinho", values_to = "to") %>%
+    filter(to != 0) %>%
+    transmute(from = as.numeric(from), to = as.numeric(to),
+      v1 = pmin(from, to), v2 = pmax(from, to)) %>%
+    distinct(v1, v2) %>%
+    transmute(from = nodes$name[v1], to = nodes$name[v2])
+
+  gs_add_edges(gs) <- arestas
+  gs
+}
+```
+
+## Antes da rede de proximidade {.code-result-slide}
+
+```{r}
+#| eval: false
+ggplot(gs) +
+  annotation_gspace_image(gs) +
+  geom_edgespace() +
+  geom_nodespace(mapping = aes(colour = seurat_clusters),
+    size = 3, pch = 19) +
+  scale_colour_manual(values = cpal1) +
+  theme_gspace_legend(discrete_colour = TRUE) +
+  spatial_theme +
+  coord_cartesian(xlim = c(0.4, 0.6), ylim = c(0.4, 0.6))
+```
+
+::: {.fragment .expected-output}
+![Recorte central antes de acrescentar as arestas.](assets/before_proximityNetwork_CellChat.png){width="70%"}
+:::
+
+## Depois da rede de proximidade {.code-result-slide}
+
+```{r}
+#| eval: false
 gs <- proximityNetwork(gs)
+
+ggplot(gs) +
+  annotation_gspace_image(gs) +
+  geom_edgespace() +
+  geom_nodespace(mapping = aes(colour = seurat_clusters),
+    size = 3, pch = 19) +
+  scale_colour_manual(values = cpal1) +
+  theme_gspace_legend(discrete_colour = TRUE) +
+  spatial_theme +
+  coord_cartesian(xlim = c(0.4, 0.6), ylim = c(0.4, 0.6))
 ```
 
-Cada nó representa um spot. As arestas registram relações de proximidade usadas para filtrar as comunicações possíveis.
+::: {.fragment .expected-output}
+![Os seis vizinhos mais próximos definem as arestas compatíveis com a malha Visium.](assets/after_proximityNetwork_CellChat.png){width="70%"}
+:::
 
-## Comunicação direcionada nas arestas
+## Associar comunicação às arestas {.code-result-slide}
 
 ```{r}
-#| label: cellchat-associar-demonstracao
 #| eval: false
-
-arestas <- gs@edges |>
-  select(name1, name2)
+arestas <- gs@edges %>% select(name1, name2)
 
 arestas_direcionadas <- bind_rows(
   arestas,
-  arestas |>
-    transmute(name1 = name2, name2 = name1)
-) |>
+  arestas %>% transmute(name1 = name2, name2 = name1)
+) %>%
   distinct()
 
-spotCom_dt <- arestas_direcionadas |>
+spotCom_dt <- arestas_direcionadas %>%
   inner_join(
-    comunicacoes,
-    by = c(
-      "name1" = "source_spot",
-      "name2" = "target_spot"
-    )
+    spot.to.spot.communication %>% filter(sample == nome_imagem),
+    by = c("name1" = "source_spot", "name2" = "target_spot")
   )
+
+spotCom_dt$arrowType <- 1
+
+interacoes_disponiveis <- spotCom_dt %>%
+  select(ligand, receptor, interaction_name) %>%
+  filter(!is.na(ligand), !is.na(receptor)) %>%
+  distinct()
+
+head(interacoes_disponiveis)
 ```
 
-## Projeção ligante-receptor
+::: {.fragment .expected-output}
+![Interações ligante--receptor disponíveis na rede espacial.](assets/interacoesDisponiveis_CellChat.png){width="72%"}
+:::
 
-O PathwaySpace projeta o sinal da rede ao longo de caminhos geodésicos e aplica decaimento espacial [@Tercan2025PathwaySpace].
+## Função de projeção espacial {.scrollable}
 
 ```{r}
-#| label: cellchat-pathwayspace-demonstracao
 #| eval: false
+communication_pathwayspace <- function(gs, lig, recep, spotCom_dt) {
+  comunicacoes <- spotCom_dt %>% filter(ligand == lig, receptor == recep)
 
-gs_selecionado <- gs_subset_nodes(
-  gs,
-  spots_selecionados
-)
+  spots_selecionados <- unique(c(comunicacoes$name1, comunicacoes$name2))
 
-pspace_obj <- buildPathwaySpace(gs_selecionado)
-pspace_obj <- silhouetteMapping(
-  pspace_obj,
-  baseline = 0.1
-)
+  gs_selecionado <- gs_subset_nodes(gs, spots_selecionados)
+  pspace_obj <- buildPathwaySpace(gs_selecionado)
 
-vertexSignal(pspace_obj) <- sinal_ligante + sinal_receptor
+  distancia_spots <- getNearestNode(pspace_obj)
+  pdist <- mean(distancia_spots$dist)
 
-pspace_obj <- circularProjection(
-  pspace_obj,
-  decay.fun = weibullDecay(
-    decay = 0.5,
-    pdist = pdist
-  ),
-  aggregate.fun = signalAggregation("wmean"),
-  k = gs_vcount(pspace_obj)
-)
+  pspace_obj <- silhouetteMapping(pspace_obj, baseline = 0.1)
+
+  resolver_features <- function(rotulo, features_disponiveis) {
+    if (rotulo %in% features_disponiveis) {
+      return(rotulo)
+    }
+
+    componentes <- strsplit(rotulo, "_", fixed = TRUE)[[1]]
+    features_disponiveis[match(tolower(componentes),
+      tolower(features_disponiveis))]
+  }
+
+  features_disponiveis <- colnames(pspace_obj@fdata)
+  features_ligante <- resolver_features(lig, features_disponiveis)
+  features_receptor <- resolver_features(recep, features_disponiveis)
+
+  if (anyNA(c(features_ligante, features_receptor))) {
+    stop("O ligante ou o receptor não foi encontrado nos dados de expressão.")
+  }
+
+  sinal_ligante <- rowSums(as.matrix(
+    pspace_obj@fdata[, features_ligante, drop = FALSE]))
+  sinal_receptor <- rowSums(as.matrix(
+    pspace_obj@fdata[, features_receptor, drop = FALSE]))
+
+  vertexSignal(pspace_obj) <- sinal_ligante + sinal_receptor
+
+  pspace_obj <- circularProjection(
+    pspace_obj, decay.fun = weibullDecay(decay = 0.5, pdist = pdist),
+    aggregate.fun = signalAggregation("wmean"),
+    k = gs_vcount(pspace_obj))
+
+  pspace_obj
+}
 ```
 
-## PathwaySpace: Fgf1-Fgfr1 {.result-slide}
+## PathwaySpace: Fgf1--Fgfr1 {.code-result-slide}
 
+```{r}
+#| eval: false
+pspace_obj <- communication_pathwayspace(
+  gs = gs, lig = "Fgf1", recep = "Fgfr1",
+  spotCom_dt = spotCom_dt)
+
+grafico_exemplo <- ggplot(pspace_obj) +
+  annotation_gspace_image(pspace_obj) +
+  annotation_pspace_signal(pspace_obj, si.alpha = 0.25) +
+  spatial_theme + labs(title = "Fgf1 - Fgfr1")
+
+grafico_exemplo
+```
+
+::: {.fragment .expected-output}
 ![](assets/cellchat-fgf1-fgfr1.png){.cellchat-map fig-align="center"}
-
-::: source-note
-A projeção concentra o sinal em domínios laterais do tecido e em focos localizados na região central.
 :::
 
-## PathwaySpace: Fgf1-Fgfr2 {.result-slide}
+## PathwaySpace: Fgf1--Fgfr2 {.code-result-slide}
 
+```{r}
+#| eval: false
+pspace_obj <- communication_pathwayspace(
+  gs = gs, lig = "Fgf1", recep = "Fgfr2",
+  spotCom_dt = spotCom_dt)
+
+grafico_exemplo <- ggplot(pspace_obj) +
+  annotation_gspace_image(pspace_obj) +
+  annotation_pspace_signal(pspace_obj, si.alpha = 0.25) +
+  spatial_theme + labs(title = "Fgf1 - Fgfr2")
+
+grafico_exemplo
+```
+
+::: {.fragment .expected-output}
 ![](assets/cellchat-fgf1-fgfr2.png){.cellchat-map fig-align="center"}
-
-::: source-note
-Fgfr2 produz uma cobertura mais contínua, com sinal amplo nos dois domínios laterais e na porção superior.
 :::
 
-## PathwaySpace: Fgf1-Fgfr3 {.result-slide}
+## PathwaySpace: Fgf1--Fgfr3 {.code-result-slide}
 
+```{r}
+#| eval: false
+pspace_obj <- communication_pathwayspace(
+  gs = gs, lig = "Fgf1", recep = "Fgfr3",
+  spotCom_dt = spotCom_dt)
+
+grafico_exemplo <- ggplot(pspace_obj) +
+  annotation_gspace_image(pspace_obj) +
+  annotation_pspace_signal(pspace_obj, si.alpha = 0.25) +
+  spatial_theme + labs(title = "Fgf1 - Fgfr3")
+
+grafico_exemplo
+```
+
+::: {.fragment .expected-output}
 ![](assets/cellchat-fgf1-fgfr3.png){.cellchat-map fig-align="center"}
-
-::: source-note
-Fgfr3 apresenta focos mais fragmentados e distribuídos pela periferia e pela porção inferior do tecido.
 :::
 
 ## Comparação entre receptores de Fgf1
@@ -985,277 +1163,209 @@ Fgfr3 apresenta focos mais fragmentados e distribuídos pela periferia e pela po
 
 ## Desafio
 
-Repita a análise usando tipos celulares inferidos pelo RCTD em vez dos clusters do Seurat.
+**Repita a análise usando tipos celulares inferidos pelo RCTD no lugar dos clusters do Seurat.**
 
-```{r}
-#| label: cellchat-desafio-demonstracao
-#| eval: false
-
-brain_rctd <- readRDS(
-  file.path(
-    diretorio_resultados,
-    "stxbrain_Seurat_com_RCTD.rds"
-  )
-)
-
-metadados$labels <- brain_rctd$first_type
-```
-
-```{r}
-#| label: cellchat-liberar-memoria
-#| include: false
-
-rm(comunicacoes, top_interacoes)
-invisible(gc())
-```
+[Vinheta anterior: deconvolução com RCTD](../../vinhetas/RCTD_Deconvolution_stxbrain.html)
 
 # Segmentação celular em Visium HD {background-color="#0B3B49"}
 
-## Alta definição espacial
+[Vinheta de referência: **segmentação celular em Visium HD**](../../vinhetas/Segmentacao_Celular_VisiumHD.html)
 
-![Exemplo de estudo com Visium HD em populações imunes de câncer colorretal. Fonte: Oliveira et al. (2025) [@DeOliveira2025VisiumHD].](assets/visiumhd-paper.png){width="77%" fig-align="center"}
+## Visium HD
 
-## O que esta prática faz
+::::: columns
+::: {.column width="48%"}
+![A captura de áreas maiores preserva o contexto do tecido.](assets/Visiumhd_CellSeg.png){width="100%"}
+:::
+::: {.column width="50%"}
+![A resolução de 2 µm permite reagrupar bins em diferentes escalas.](assets/Visiumhd2_CellSeg.png){width="100%"}
+:::
+:::::
 
--   Usa limites celulares já estimados pelo processamento do Visium HD.
--   Não executa um novo algoritmo de segmentação.
--   Representa cada célula como centro e como polígono.
--   Projeta a expressão de PIGR no espaço contínuo.
+## De bins a células
 
-## Objeto preparado
+![Segmentação e agregação dos bins no limite celular.](assets/Visiumhd3_CellSeg.png){width="88%" fig-align="center"}
+
+## Exemplo de aplicação
+
+![Populações imunes em câncer colorretal analisadas com Visium HD. Fonte: Oliveira et al. (2025) [@DeOliveira2025VisiumHD].](assets/visiumhd-paper.png){width="77%" fig-align="center"}
+
+## Objetivo da prática
+
+-   Inspecionar geometrias celulares já estimadas.
+-   Representar cada célula como centro e como polígono.
+-   Comparar expressão discreta e sinal espacial contínuo.
+-   Integrar RGraphSpace, sf e PathwaySpace.
+
+## Pacotes
+
+```{r}
+#| label: segmentacao-pacotes
+#| cache: false
+library("RGraphSpace")
+library("sf")
+library("ggplot2")
+library("patchwork")
+library("PathwaySpace")
+```
+
+## Carregar o objeto preparado {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-carregar
 #| cache: false
-#| echo: false
+#| output-location: fragment
+arquivo_dados <- file.path(diretorio_dados, "VisiumHD_GS_Crop.RDS")
 
-suppressPackageStartupMessages({
-  library("RGraphSpace")
-  library("PathwaySpace")
-  library("sf")
-  library("patchwork")
-})
+gs_crop <- readRDS(arquivo_dados)
 
-arquivo_visiumhd <- arquivo_obrigatorio(
-  diretorio_dados,
-  "VisiumHD_GS_Crop.RDS"
-)
+if (!inherits(gs_crop, "GraphSpace")) {
+  stop("O arquivo baixado não contém um objeto da classe GraphSpace.")}
 
-gs_crop <- readRDS(arquivo_visiumhd)
-
-stopifnot(inherits(gs_crop, "GraphSpace"))
-
-data.frame(
-  componente = c("células", "genes"),
-  valor = c(nrow(gs_crop@nodes), ncol(gs_crop@fdata))
-) |>
-  knitr::kable(row.names = FALSE)
+gs_crop
 ```
 
-## Geometrias celulares
+## Geometrias celulares {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-geometrias
 #| cache: false
-#| echo: false
+#| output-location: fragment
+gs_crop@nodes$cellseg
 
 geometrias_celulares <- gs_crop@nodes$cellseg
 
-tipos_geometria <- as.data.frame(
-  table(sf::st_geometry_type(geometrias_celulares)),
-  stringsAsFactors = FALSE
-)
-
-names(tipos_geometria) <- c("geometria", "celulas")
-tipos_geometria <- tipos_geometria[
-  tipos_geometria$celulas > 0,
-  ,
-  drop = FALSE
-]
-
-knitr::kable(
-  tipos_geometria,
-  row.names = FALSE
-)
+length(geometrias_celulares)
+sf::st_geometry_type(geometrias_celulares) |> table()
 ```
 
-O objeto contém 539 células, com geometrias POLYGON e MULTIPOLYGON alinhadas aos nós do GraphSpace.
-
-## Células individuais
+## Células individuais {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-celulas-individuais
 #| cache: false
-#| echo: false
-#| out-width: "94%"
-#| fig-width: 12
-#| fig-height: 4.2
-#| fig-align: center
-
-parametros_graficos <- par(
-  mfrow = c(1, 3),
-  mar = c(1.5, 1.5, 2.5, 1.5)
-)
-
-for (i in 1:3) {
-  plot(
-    geometrias_celulares[i],
-    main = paste("Celula", i),
-    axes = FALSE
-  )
-}
-
-par(parametros_graficos)
+#| fig-show: hold
+#| out-width: "31%"
+#| fig-width: 4
+#| fig-height: 4
+#| output-location: fragment
+plot(gs_crop@nodes$cellseg[1])
+plot(gs_crop@nodes$cellseg[2])
+plot(gs_crop@nodes$cellseg[3])
 ```
 
-## Primeiras vinte geometrias
+## Primeiras vinte geometrias {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-combinar
 #| cache: false
-#| echo: false
 #| fig-width: 6
-#| fig-height: 5.5
-#| out-width: "72%"
+#| fig-height: 6
+#| out-width: "58%"
 #| fig-align: center
-
-plot(
-  sf::st_combine(geometrias_celulares[1:20]),
-  main = "Contornos preservados"
-)
+#| output-location: fragment
+plot(st_combine(gs_crop@nodes$cellseg[1:20]))
 ```
 
-## Limites sobre a imagem do tecido
+## Escala comum para PIGR
+
+```{r}
+#| label: segmentacao-escala
+#| cache: false
+cpal <- hcl.colors(100, palette = "Geyser", rev = FALSE)
+data_range <- range(log2(gs_crop[["fdata"]] + 1))
+```
+
+A mesma transformação, paleta e limites serão usados nos painéis seguintes.
+
+## Limites sobre a imagem {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-limites
 #| cache: false
-#| echo: false
-#| fig-width: 7.5
-#| fig-height: 5.6
-#| out-width: "72%"
+#| fig-width: 7
+#| fig-height: 6
+#| out-width: "58%"
 #| fig-align: center
-
-p_limites <- ggplot(gs_crop) +
+#| output-location: fragment
+p_nodes <- ggplot(gs_crop) +
   annotation_gspace_image(gs_crop, opacity = 1) +
-  geom_sf(
-    aes(geometry = cellseg),
-    fill = NA,
-    linewidth = 0.35,
-    colour = "cyan"
-  ) +
-  geom_nodespace(
-    colour = "black",
-    size = 0.25,
-    pch = 19
-  ) +
+  geom_sf( aes(geometry = cellseg), fill = NA,
+    linewidth = 0.3, colour = "cyan") +
+  geom_nodespace(colour = "black", size = 0.1, pch = 19) +
+  scale_fill_continuous(palette = cpal, limits = data_range) +
   theme_gspace_coords(
-    theme = "th3",
-    is_norm = TRUE,
+    theme = "th3",is_norm = TRUE,
     xlab = "Coordenada do tecido 1",
-    ylab = "Coordenada do tecido 2"
-  )
-
-p_limites
+    ylab = "Coordenada do tecido 2")
+p_nodes
 ```
 
-## Células como vértices
+## Células como vértices {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-vertices
 #| cache: false
-#| echo: false
 #| fig-width: 7
-#| fig-height: 5.4
-#| out-width: "70%"
+#| fig-height: 6
+#| out-width: "58%"
 #| fig-align: center
-
-cpal_segmentacao <- hcl.colors(
-  100,
-  palette = "Geyser",
-  rev = FALSE
-)
-
-intervalo_pigr <- range(
-  log2(gs_crop@fdata[, "PIGR"] + 1),
-  na.rm = TRUE
-)
-
-p_vertices <- ggplot(gs_crop) +
+#| output-location: fragment
+p1 <- ggplot(gs_crop) +
   annotation_gspace_image(gs_crop, opacity = 1) +
   geom_nodespace(
-    aes(colour = log2(PIGR + 1)),
-    size = 1.5,
-    pch = 19
-  ) +
-  scale_colour_continuous(
-    palette = cpal_segmentacao,
-    limits = intervalo_pigr
-  ) +
+    mapping = aes(colour = log2(PIGR + 1)),
+    size = 1.5,pch = 19) +
+  scale_colour_continuous(palette = cpal, limits = data_range) +
   theme_gspace_coords(
-    theme = "th3",
-    is_norm = TRUE,
+    theme = "th3",is_norm = TRUE,
     xlab = "Coordenada do tecido 1",
-    ylab = "Coordenada do tecido 2"
-  )
+    ylab = "Coordenada do tecido 2")
 
-p_vertices
+p1
 ```
 
-## Células como polígonos
+## Células como polígonos {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-poligonos
 #| cache: false
-#| echo: false
 #| fig-width: 7
-#| fig-height: 5.4
-#| out-width: "70%"
+#| fig-height: 6
+#| out-width: "58%"
 #| fig-align: center
-
-p_poligonos <- ggplot(gs_crop) +
+#| output-location: fragment
+p2 <- ggplot(gs_crop) +
   annotation_gspace_image(gs_crop, opacity = 1) +
   geom_sf(
-    aes(
+    mapping = aes(
       geometry = cellseg,
-      fill = log2(PIGR + 1)
-    ),
-    linewidth = 0.15
-  ) +
-  scale_fill_continuous(
-    palette = cpal_segmentacao,
-    limits = intervalo_pigr
-  ) +
-  geom_nodespace(
-    colour = "black",
-    size = 0.2,
-    pch = 19
-  ) +
+      fill = log2(PIGR + 1))) +
+  scale_fill_continuous(palette = cpal, limits = data_range) +
+  geom_nodespace(colour = "black", size = 0.2, pch = 19) +
   theme_gspace_coords(
-    theme = "th3",
-    is_norm = TRUE,
+    theme = "th3",is_norm = TRUE,
     xlab = "Coordenada do tecido 1",
-    ylab = "Coordenada do tecido 2"
-  )
+    ylab = "Coordenada do tecido 2")
 
-p_poligonos
+p2
 ```
 
-## Centros e limites celulares
+## Centros e polígonos {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-comparacao
 #| cache: false
-#| echo: false
 #| fig-width: 12
-#| fig-height: 5.5
-#| out-width: "94%"
+#| fig-height: 6
+#| out-width: "78%"
 #| fig-align: center
-
-p_vertices + p_poligonos +
+#| output-location: fragment
+p <- p1 + p2 +
   patchwork::plot_annotation(
-    title = "Expressao de PIGR no Visium HD"
-  )
+    title = "Integração do RGraphSpace com geometrias sf",
+    theme = theme(plot.title = element_text(hjust = 0.5)))
+p
 ```
 
 ## Construir o PathwaySpace
@@ -1263,49 +1373,32 @@ p_vertices + p_poligonos +
 ```{r}
 #| label: segmentacao-pathwayspace
 #| cache: false
-#| results: hide
+pspace_obj <- buildPathwaySpace(gs_crop, nrc = 700)
 
-pspace_visiumhd <- buildPathwaySpace(
-  gs_crop,
-  nrc = 700
-)
-
-vizinhos_visiumhd <- getNearestNode(pspace_visiumhd)
-pdist_visiumhd <- mean(vizinhos_visiumhd$dist)
-
-pspace_visiumhd <- silhouetteMapping(
-  pspace_visiumhd,
-  fill.cavity = FALSE,
-  baseline = 0.03,
-  pdist = max(vizinhos_visiumhd$dist)
-)
-
-pdist_visiumhd
+nspot <- getNearestNode(pspace_obj)
+pdist <- mean(nspot$dist) # distância média
+pdist
 ```
 
-## Silhueta de projeção
+## Silhueta de projeção {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-silhueta
 #| cache: false
-#| echo: false
-#| fig-width: 7.4
-#| fig-height: 5.4
-#| out-width: "70%"
+#| fig-width: 7
+#| fig-height: 6
+#| out-width: "58%"
 #| fig-align: center
+#| output-location: fragment
+pspace_obj <- silhouetteMapping(pspace_obj, fill.cavity = FALSE, baseline = 0.03, pdist = max(nspot$dist))
 
-ggplot(pspace_visiumhd) +
-  annotation_gspace_image(pspace_visiumhd) +
-  annotation_pspace_signal(
-    pspace_visiumhd,
-    si.alpha = 0.5
-  ) +
+ggplot(pspace_obj) +
+  annotation_gspace_image(pspace_obj) +
+  annotation_pspace_signal(pspace_obj, si.alpha = 0.5) +
   theme_gspace_coords(
-    theme = "th3",
-    is_norm = TRUE,
+    theme = "th3",is_norm = TRUE,
     xlab = "Coordenada do tecido 1",
-    ylab = "Coordenada do tecido 2"
-  )
+    ylab = "Coordenada do tecido 2")
 ```
 
 ## Projetar PIGR
@@ -1313,73 +1406,56 @@ ggplot(pspace_visiumhd) +
 ```{r}
 #| label: segmentacao-projecao
 #| cache: false
+activeFeature(pspace_obj) <- "PIGR"
 
-activeFeature(pspace_visiumhd) <- "PIGR"
-
-pspace_visiumhd <- circularProjection(
-  pspace_visiumhd,
-  k = gs_vcount(pspace_visiumhd),
-  decay.fun = weibullDecay(
-    decay = 0.5,
-    pdist = pdist_visiumhd
-  )
-)
+pspace_obj <- circularProjection(pspace_obj, k = gs_vcount(pspace_obj),
+                                 decay.fun = weibullDecay(decay=0.5, pdist = pdist))
 ```
 
-## Polígono e sinal contínuo
+## Polígono e sinal contínuo {.code-result-slide}
 
 ```{r}
 #| label: segmentacao-painel-final
 #| cache: false
-#| echo: false
 #| fig-width: 12
-#| fig-height: 5.5
-#| out-width: "94%"
+#| fig-height: 6
+#| out-width: "78%"
 #| fig-align: center
-
-p_projecao <- ggplot(pspace_visiumhd) +
-  annotation_gspace_image(pspace_visiumhd) +
-  annotation_pspace_signal(
-    pspace_visiumhd,
-    si.alpha = 0.4,
-    title = "PIGR"
+#| output-location: fragment
+p3 <- ggplot(pspace_obj) +
+  annotation_gspace_image(pspace_obj) +
+  annotation_pspace_signal(pspace_obj, si.alpha = 0, title = "") +
+  geom_sf(
+    aes(
+      geometry = cellseg
+    ),
+    alpha = 0,
+    linewidth = 0.3,
+    colour = "white"
+  ) +
+  geom_nodespace(
+    colour = "black",
+    size = 0.1,
+    pch = 19
   ) +
   theme_gspace_coords(
-    theme = "th3",
-    is_norm = TRUE,
+    theme = "th3",is_norm = TRUE,
     xlab = "Coordenada do tecido 1",
-    ylab = "Coordenada do tecido 2"
-  )
+    ylab = "Coordenada do tecido 2")
 
-p_poligonos + p_projecao +
+p_comp <- p2 + p3 +
   patchwork::plot_annotation(
-    title = "RGraphSpace e PathwaySpace"
-  )
+    title = "Integração do RGraphSpace com PathwaySpace",
+    theme = theme(plot.title = element_text(hjust = 0.5)))
+p_comp
 ```
 
 ## Leitura da comparação
 
 -   Os vértices resumem a posição de cada célula.
 -   Os polígonos preservam forma e área.
--   A projeção contínua mostra como o sinal se distribui entre os centros.
+-   A projeção contínua distribui o sinal entre os centros.
 -   O GraphSpace mantém expressão, posição e geometria alinhadas [@RGraphSpace2026].
-
-```{r}
-#| label: segmentacao-liberar-memoria
-#| include: false
-#| cache: false
-
-rm(
-  gs_crop,
-  geometrias_celulares,
-  p_limites,
-  p_vertices,
-  p_poligonos,
-  pspace_visiumhd,
-  p_projecao
-)
-invisible(gc())
-```
 
 # Referências e análises downstream {background-color="#0B3B49"}
 
